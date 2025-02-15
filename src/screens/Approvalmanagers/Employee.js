@@ -15,6 +15,7 @@ const Employee = () => {
         setLoading(true); // Show loading indicator
         const response = await getEmplyeedata();
         
+        console.log("response",response)
         if (response?.data) {
           setEmployees(response.data);
         } else {

@@ -63,3 +63,15 @@ export const getEmplyeedata = async () => {
   return await handleApiRequestAfterLoginService(`org-user-association/${orgId}/get-users/userId/${id}/role/employee/status/ALL?page=0&size=10`, "POST", {});
 };
 
+export const getApprovalManagerdata = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`${orgId}/users?role=approvalManagers&page=0&size=10` ,"GET",{});
+};
+
+export const getClientSuperadmindata = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+    const orgId = await AsyncStorage.getItem("orgId");
+    return await handleApiRequestAfterLoginService(`timesheet/${orgId}/clients/search?page=0&size=10`,"POST",{});
+};
+

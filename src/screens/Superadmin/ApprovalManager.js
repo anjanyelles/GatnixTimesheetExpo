@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { getApprovalManagerdata } from '../aftherlogin';
 
 const ApprovalManager = () => {
-  const allData = [
-    { id: 'T011253', firstName: 'Karthik', lastName: 'Karthik', email: 'tejavishwa0408@gmail.com', phone: '77024 43766' },
-    { id: 'T011254', firstName: 'John', lastName: 'Doe', email: 'johndoe@example.com', phone: '12345 67890' },
-    { id: 'T011255', firstName: 'Jane', lastName: 'Smith', email: 'janesmith@example.com', phone: '23456 78901' },
-    { id: 'T011256', firstName: 'Alex', lastName: 'Johnson', email: 'alexjohnson@example.com', phone: '34567 89012' },
-  ];
-
+  const [allData, setAllData] = useState([]); 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState('All Employees');
 
+  useEffect(() => {
+    const fetchApprovalManagerData = async () => {
+      try {
+        const response = await getApprovalManagerdata();
+        if (response?.data) {
+          
+          const formattedData = response.data.map((item, index) => ({
+            id: `${index + 1}`, // Ensure ID is a string
+            firstName: item.firstName || '',
+            lastName: item.lastName || '',
+            email: item.email || '',
+            phone: item.mobile || '',
+          }));
+          console.log("formattedData",formattedData)
+          setAllData(formattedData); // ✅ Update allData with API response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchApprovalManagerData();
+  }, []);
+
   const getFilteredData = () => {
-    const filteredData = allData.filter(
-      (item) =>
-        item.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.id.toLowerCase().includes(searchQuery.toLowerCase())
+    if (!searchQuery) return allData; // Return all data if search is empty
+
+    return allData.filter((item) =>
+      [item.firstName, item.lastName, item.email, item.phone, String(item.id)] // Ensure ID is a string
+        .filter(Boolean) // Remove undefined/null values
+        .some((field) => field.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-    return filteredData; // No filtering by tab selected here for simplicity
   };
 
-  const handleEdit = (id) => {
-    console.log(`Edit employee with ID: ${id}`);
-  };
-
-  const handleView = (id) => {
-    console.log(`View employee with ID: ${id}`);
-  };
-
-  const handleDelete = (id) => {
-    console.log(`Delete employee with ID: ${id}`);
-  };
+  const handleEdit = (id) => console.log(`Edit employee with ID: ${id}`);
+  const handleView = (id) => console.log(`View employee with ID: ${id}`);
+  const handleDelete = (id) => console.log(`Delete employee with ID: ${id}`);
 
   const renderRow = ({ item, index }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{index + 1}</Text> {/* Display row index as S.No */}
+      <Text style={styles.cell}>{index + 1}</Text> 
       <Text style={styles.cell}>{item.firstName}</Text>
       <Text style={styles.cell}>{item.lastName}</Text>
       <Text style={styles.cell}>{item.email}</Text>
       <Text style={styles.cell}>{item.phone}</Text>
-
-      {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity onPress={() => handleView(item.id)}>
           <Ionicons name="eye" size={20} color="#4CAF50" style={styles.icon} />
@@ -62,50 +69,29 @@ const ApprovalManager = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Employee</Text>
-
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
         <TextInput
           style={styles.searchBar}
-          placeholder="Search by Name, Period, Status, or ID"
+          placeholder="Search by Name, Email, Phone, or ID"
           value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
+          onChangeText={setSearchQuery}
         />
       </View>
 
-      {/* Tab Buttons */}
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={[
-            styles.buttongroup,
-            selectedTab === 'All Employees' && styles.selectedButton,
-          ]}
-          onPress={() => setSelectedTab('All Employees')}>
-          <Text style={styles.buttonText}>All Employees</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.buttongroup,
-            selectedTab === 'Active Employees' && styles.selectedButton,
-          ]}
-          onPress={() => setSelectedTab('Active Employees')}>
-          <Text style={styles.buttonText}>Active Employees</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.buttongroup,
-            selectedTab === 'Inactive Employees' && styles.selectedButton,
-          ]}
-          onPress={() => setSelectedTab('Inactive Employees')}>
-          <Text style={styles.buttonText}>Inactive Employees</Text>
-        </TouchableOpacity>
+        {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
+            onPress={() => setSelectedTab(tab)}>
+            <Text style={styles.buttonText}>{tab}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={[styles.row, styles.header]}>
             {['S.No', 'First Name', 'Last Name', 'Email', 'Phone No', 'Actions'].map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
@@ -114,11 +100,11 @@ const ApprovalManager = () => {
             ))}
           </View>
 
-          {/* Table Data */}
           <FlatList
             data={getFilteredData()}
             renderItem={renderRow}
             keyExtractor={(item) => item.id}
+            ListEmptyComponent={<Text style={styles.noDataText}>No employees found</Text>}
           />
         </View>
       </ScrollView>

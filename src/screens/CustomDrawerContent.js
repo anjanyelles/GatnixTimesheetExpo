@@ -228,7 +228,7 @@ const CustomDrawerContent = (props) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.subMenuItem}
-                onPress={() => props.navigation.navigate("EmployeeSuperadmin")}
+                onPress={() => props.navigation.navigate("Employee")}
                 activeOpacity={0.7}
               >
                 <Icon name="checkmark-done-outline" size={18} color="#666" />

@@ -40,12 +40,14 @@ const DrawerNavigator = () => (
     }}
   >
     
-    <Drawer.Screen name="TableContiner" component={TableContiner} />
-        <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
-    <Drawer.Screen name="Dashboard" component={Dashboard} />
-    <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
+
 
     <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
+    <Drawer.Screen name="Dashboard" component={Dashboard} />
+    <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
+    <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
+    <Drawer.Screen name="TableContiner" component={TableContiner} />
+    {/* <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} /> */}
     <Drawer.Screen name="PendingSheets" component={PendingSheets} />
     <Drawer.Screen name="RejectedSheets" component={RejectedSheets} />
     <Drawer.Screen name="RecalledSheets" component={RecalledSheets} />
@@ -71,6 +73,7 @@ const App = () => {
 
         <Stack.Screen name="Main" component={DrawerNavigator} />
         <Stack.Screen name="SignInScreen" component={SignInScreen} />
+
         <Stack.Screen name="Otp" component={Otp} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
