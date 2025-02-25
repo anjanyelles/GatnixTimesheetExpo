@@ -80,7 +80,7 @@ const CustomDrawerContent = (props) => {
           {/* Project */}
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => props.navigation.navigate("Project")}
+            onPress={() => props.navigation.navigate("Project11")}
             activeOpacity={0.7}
           >
             <Icon name="folder-outline" size={20} color="#333" />
@@ -90,8 +90,9 @@ const CustomDrawerContent = (props) => {
           {/* Timesheet with Submenu */}
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={toggleSubMenu}
+            onPress={() => props.navigation.navigate("TimeSheetpagetable")}
             activeOpacity={0.7}
+            
           >
             <Icon name="time-outline" size={20} color="#333" />
             <Text style={styles.menuText}>Timesheet</Text>
@@ -107,7 +108,7 @@ const CustomDrawerContent = (props) => {
             <View style={styles.subMenu}>
               <TouchableOpacity
                 style={styles.subMenuItem}
-                onPress={() => props.navigation.navigate("Timesheetpage")}
+                onPress={() => props.navigation.navigate("TimeSheetpagetable")}
                 activeOpacity={0.7}
               >
                 <Icon name="document-text-outline" size={18} color="#666" />
@@ -267,17 +268,29 @@ const CustomDrawerContent = (props) => {
             <View style={styles.subMenu}>
               <TouchableOpacity
                 style={styles.subMenuItem}
-                onPress={() => props.navigation.navigate("Timesheetpage")}
+                onPress={() => props.navigation.navigate("Project")}
                 activeOpacity={0.7}
               >
                 <Icon name="document-text-outline" size={18} color="#666" />
-                <Text style={styles.subMenuText}>Sheet</Text>
+                <Text style={styles.subMenuText}>Project</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => props.navigation.navigate("TimeSheetpagetable")}
+            activeOpacity={0.7}
+          >
+            <Icon name="person-outline" size={20} color="#333" />
+            <Text style={styles.menuText}>Time Sheets</Text>
+          </TouchableOpacity>
+
+
               <TouchableOpacity
                 style={styles.subMenuItem}
                 onPress={() => props.navigation.navigate("SubmittedSheets")}
                 activeOpacity={0.7}
               >
+                
                 <Icon name="checkmark-done-outline" size={18} color="#666" />
                 <Text style={styles.subMenuText}>Submitted Sheets</Text>
               </TouchableOpacity>
@@ -315,12 +328,20 @@ const CustomDrawerContent = (props) => {
               </TouchableOpacity>
             </View>
           )}
+<TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => props.navigation.navigate("TimesheetsSettings")}
+            activeOpacity={0.7}
+          >
+            <Icon name="person-outline" size={20} color="#333" />
+            <Text style={styles.menuText}>Timesheets Settings</Text>
+          </TouchableOpacity>
 
 
 
 <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => props.navigation.navigate("Organization Settings")}
+            onPress={() => props.navigation.navigate("OrganizationalSettings")}
             activeOpacity={0.7}
           >
             <Icon name="person-outline" size={20} color="#333" />

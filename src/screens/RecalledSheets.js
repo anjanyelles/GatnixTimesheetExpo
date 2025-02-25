@@ -1,51 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button, Linking } from 'react-native';
+import { getRecalledsheetdata } from './aftherlogin';
 
 const RecalledSheets = () => {
-  // Sample data for the table
-  const allData = [
-    {
-      id: 'T011253',
-      employeeName: 'Vishwa Tejaaaa',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '45.0',
-      client: 'Gatnix Time sheets',
-      endClient: 'Infosyc',
-      status: 'Submitted',
-      comments: 'Timesheet ...',
-    },
-    {
-      id: 'T011254',
-      employeeName: 'John Doe',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '40.0',
-      client: 'Global Tech',
-      endClient: 'TechCorp',
-      status: 'Approved',
-      comments: 'Approved by manager',
-    },
-    {
-      id: 'T011255',
-      employeeName: 'Jane Smith',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '35.0',
-      client: 'XZY Solutions',
-      endClient: 'TechHive',
-      status: 'Pending',
-      comments: 'Pending approval',
-    },
-    {
-      id: 'T011256',
-      employeeName: 'Alex Johnson',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '42.0',
-      client: 'InovaTech',
-      endClient: 'BizCorp',
-      status: 'Rejected',
-      comments: 'Rejected by manager',
-    },
-    // Add more data as needed
-  ];
+  const [allData, setAllData] = useState([]);  // Corrected useState
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const [displayedData, setDisplayedData] = useState([]);  // Initializing as an empty array
 
   const tableHeaders = [
     'T.ID',
@@ -58,12 +19,38 @@ const RecalledSheets = () => {
     'Comments',
   ];
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Number of items per page
-  const [displayedData, setDisplayedData] = useState(allData.slice(0, itemsPerPage));
+  useEffect(() => {
+    const fetchRecalledSheetdata = async () => {  
+      try {
+        const response = await getRecalledsheetdata();
+        console.log('API Response:', response);  
 
-  // Load more data when user goes to the next page
+        if (response?.data) {
+          const formattedData = response.data.map((item, index) => ({
+            sheetId: item.sheetId|| '',
+            employeeName: item.employeeName || '',
+            period: `${new Date(item.startDate * 1000).toLocaleDateString()} - ${new Date(item.endDate * 1000).toLocaleDateString()}`,
+            totalHours: item.billableHours || '',
+            client: item.clientName || '',
+            endClient: item.endClientName || '',
+            status: item.status || '',
+            comments: item.comments?.length > 0 ? item.comments[0].comment : '',
+            attachments : item.attachments  || '',  // Add a download link field (assumed available in the response)
+          }));
+
+          console.log('Formatted Data:', formattedData); // Debugging formatted data
+
+          setAllData(formattedData);
+          setDisplayedData(formattedData.slice(0, itemsPerPage)); // Show first page
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchRecalledSheetdata();
+  }, []);  // Empty dependency array to fetch data only once on mount
+
   const loadDataForPage = (page) => {
     const startIndex = (page - 1) * itemsPerPage;
     const newData = allData.slice(startIndex, startIndex + itemsPerPage);
@@ -85,16 +72,34 @@ const RecalledSheets = () => {
     }
   };
 
+  // Handle "Download" button click
+  const handleDownload = (url) => {
+    if (url) {
+      Linking.openURL(url).catch((err) => console.error('Failed to open URL:', err));
+    }
+  };
+
   // Render a single row in the table
   const renderRow = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
+      <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
       <Text style={styles.cell}>{item.period}</Text>
       <Text style={styles.cell}>{item.totalHours}</Text>
       <Text style={styles.cell}>{item.client}</Text>
       <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
+      <Text style={styles.cell}>
+        {item.downloadLink ? (
+          <Text
+            style={styles.downloadLink}
+            onPress={() => handleDownload(item.downloadLink)}
+          >
+            Download Sheet
+          </Text>
+        ) : (
+          item.status
+        )}
+      </Text>
       <Text style={styles.cell}>{item.comments}</Text>
     </View>
   );
@@ -128,12 +133,12 @@ const RecalledSheets = () => {
         <Button
           title="Prev"
           onPress={prevPage}
-          disabled={currentPage === 1} // Disable if on the first page
+          disabled={currentPage === 1}  // Disable if on the first page
         />
         <Button
           title="Next"
           onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
+          disabled={currentPage * itemsPerPage >= allData.length}  // Disable if on the last page
         />
       </View>
     </View>
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
-    width: 120, // Equal width for header cells
+    width: 120,  // Equal width for header cells
     padding: 4,
   },
   row: {
@@ -179,7 +184,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     paddingHorizontal: 5,
-    width: 120, // Equal width for data cells
+    width: 120,  // Equal width for data cells
+  },
+  downloadLink: {
+    color: '#0066cc',
+    textDecorationLine: 'underline',
   },
   paginationWrapper: {
     flexDirection: 'row',

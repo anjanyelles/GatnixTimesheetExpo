@@ -24,11 +24,16 @@ import EmployeeSuperadmin from './src/screens/Superadmin/ClientSuperadmin';
 import SignInScreen from './src/SignInScreen';
 import Otp from './src/screens/Otp';
 import TableContiner from './src/screens/TableContiner';
+import TimesheetsSettings from './src/screens/Superadmin/TimesheetsSettings';
+import OrganizationalSettings from './src/screens/Superadmin/OrganizationalSettings';
+import OrganisationSettings from './src/screens/Superadmin/OrganizationalSettings';
+import ProjectDetails from './src/screens/ProjectDetails';
+import TimeSheetpagetable from './src/screens/TimeSheetpagetable';
+
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-// Drawer Navigator
 const DrawerNavigator = () => (
   <Drawer.Navigator
     drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -39,12 +44,25 @@ const DrawerNavigator = () => (
       },
     }}
   >
-    
+
+{/* <Drawer.Screen name="ProjectDetails" component={ProjectDetails} /> */}
+
+<Drawer.Screen name="Project" component={Project} />
+
+<Drawer.Screen name="TimeSheetpagetable" component={TimeSheetpagetable} />
+
+<Drawer.Screen name="OrganisationSettings" component={OrganisationSettings} />
+
+<Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
 
 
+
+
+    <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
     <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
     <Drawer.Screen name="Dashboard" component={Dashboard} />
-    <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
+    <Drawer.Screen name ="OrganizationalSettings" component={OrganizationalSettings} />
+    {/* <Drawer.Screen name ="TimesheetsSettings" component={TimesheetsSettings}/> */}
     <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
     <Drawer.Screen name="TableContiner" component={TableContiner} />
     {/* <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} /> */}
@@ -55,7 +73,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="EditProfile" component={EditProfile} />
     {/* Approval Managers */}
     <Drawer.Screen name="Client" component={Client} />
-    <Drawer.Screen name="Project" component={Project} />
+    {/* <Drawer.Screen name="Project" component={Project} /> */}
     <Drawer.Screen name="Employee" component={Employee} />
     {/* Superadmin */}
     <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} />

@@ -1,95 +1,72 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
-import { Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button, Platform } from 'react-native';
+import { getSubmittedsheetdata } from './aftherlogin';
+
 
 const SubmittedSheets = () => {
-  // Sample data for the table
-  const allData = [
-    {
-      id: 'T011253',
-      employeeName: 'Vishwa Tejaaaa',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '45.0',
-      client: 'Gatnix Time sheets',
-      endClient: 'Infosyc',
-      status: 'Submitted',
-      comments: 'Timesheet ...',
-    },
-    {
-      id: 'T011254',
-      employeeName: 'John Doe',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '40.0',
-      client: 'Global Tech',
-      endClient: 'TechCorp',
-      status: 'Approved',
-      comments: 'Approved by manager',
-    },
-    {
-      id: 'T011255',
-      employeeName: 'Jane Smith',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '35.0',
-      client: 'XZY Solutions',
-      endClient: 'TechHive',
-      status: 'Pending',
-      comments: 'Pending approval',
-    },
-    {
-      id: 'T011256',
-      employeeName: 'Alex Johnson',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '42.0',
-      client: 'InovaTech',
-      endClient: 'BizCorp',
-      status: 'Rejected',
-      comments: 'Rejected by manager',
-    },
-    // Add more data as needed
-  ];
-
+  const [allData, setAllData] = useState([]); 
   const tableHeaders = [
-    'T.ID',
-    'Employee Name',
-    'Period',
-    'Total Hours',
-    'Client',
-    'End Client',
-    'Status',
-    'Comments',
+    'T.ID', 'Employee Name', 'Period', 'Total Hours', 'Client', 'End Client', 'Status', 'Comments',
   ];
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Number of items per page
-  const [displayedData, setDisplayedData] = useState(allData.slice(0, itemsPerPage));
+  useEffect(() => {
+    const fetchSubmissionSheetdata = async () => {
+        try {
+            const response = await getSubmittedsheetdata();
+            console.log(response.data[0].startDate); // Debugging output
 
-  // Load more data when user goes to the next page
+            if (response?.data) {
+                const formattedData = response.data.map((item, index) => ({
+                    sheetId : item.sheetId || '',
+                    employeeName: item.employeeName || '',
+                    period: `${new Date(item.startDate * 1000).toLocaleDateString()} - ${new Date(item.endDate * 1000).toLocaleDateString()}`,
+                    totalHours: item.billableHours || '',
+                    client: item.clientName || '',
+                    endClient: item.endClientName || '',
+                    status: item.status || '',
+                    comments: item.comments.length > 0 ? item.comments[0].comment : '',
+                }));
+
+                setAllData(formattedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    fetchSubmissionSheetdata();
+}, []);
+
+// Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const [displayedData, setDisplayedData] = useState([]);
+
+  useEffect(() => {
+    setDisplayedData(allData.slice(0, itemsPerPage));
+  }, [allData]);
+
   const loadDataForPage = (page) => {
     const startIndex = (page - 1) * itemsPerPage;
-    const newData = allData.slice(startIndex, startIndex + itemsPerPage);
-    setDisplayedData(newData);
+    setDisplayedData(allData.slice(startIndex, startIndex + itemsPerPage));
     setCurrentPage(page);
   };
 
-  // Handle "Next" button click
   const nextPage = () => {
     if ((currentPage * itemsPerPage) < allData.length) {
       loadDataForPage(currentPage + 1);
     }
   };
 
-  // Handle "Previous" button click
   const prevPage = () => {
     if (currentPage > 1) {
       loadDataForPage(currentPage - 1);
     }
   };
 
-  // Render a single row in the table
   const renderRow = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
+      <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
       <Text style={styles.cell}>{item.period}</Text>
       <Text style={styles.cell}>{item.totalHours}</Text>
@@ -105,7 +82,8 @@ const SubmittedSheets = () => {
       <Text style={styles.title}>Submitted Time Sheets</Text>
 
       <ScrollView horizontal>
-      <View style={{  }}>          {/* Table Header */}
+        <View>
+          {/* Table Header */}
           <View style={[styles.row, styles.header]}>
             {tableHeaders.map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
@@ -125,27 +103,19 @@ const SubmittedSheets = () => {
 
       {/* Pagination Controls */}
       <View style={styles.paginationWrapper}>
-        <Button
-          title="Prev"
-          onPress={prevPage}
-          disabled={currentPage === 1} // Disable if on the first page
-        />
-        <Button
-          title="Next"
-          onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
-        />
+        <Button title="Prev" onPress={prevPage} disabled={currentPage === 1} />
+        <Button title="Next" onPress={nextPage} disabled={currentPage * itemsPerPage >= allData.length} />
       </View>
     </View>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
     backgroundColor: '#f8f9fa',
-    
   },
   title: {
     fontSize: 18,
@@ -159,22 +129,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 5,
     flexDirection: 'row',
-
   },
   headerText: {
     color: 'rgb(74, 73, 73)',
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
-    width: 120, // Equal width for header cells
+    width: 120,
     padding: 4,
     fontFamily: Platform.select({
-      ios: 'San Francisco', // Default system font for iOS
-      android: 'Roboto', // Default system font for Android
-      default: 'System' // Fallback for other platforms
+      ios: 'San Francisco',
+      android: 'Roboto',
+      default: 'System',
     }),
   },
-  
   row: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -188,12 +156,11 @@ const styles = StyleSheet.create({
     color: '#333',
     paddingHorizontal: 5,
     fontFamily: Platform.select({
-      ios: 'San Francisco', // Default system font for iOS
-      android: 'Roboto', // Default system font for Android
-      default: 'System' // Fallback for other platforms
+      ios: 'San Francisco',
+      android: 'Roboto',
+      default: 'System',
     }),
-    width: 120, // Equal width for data cells
-
+    width: 120,
   },
   paginationWrapper: {
     flexDirection: 'row',

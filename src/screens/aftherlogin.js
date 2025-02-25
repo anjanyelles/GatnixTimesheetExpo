@@ -75,3 +75,92 @@ export const getClientSuperadmindata = async ()=>{
     return await handleApiRequestAfterLoginService(`timesheet/${orgId}/clients/search?page=0&size=10`,"POST",{});
 };
 
+export const getSubmittedsheetdata = async ()=>{
+  const id =await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage .getItem("orgId");
+  return await handleApiRequestAfterLoginService (`timesheet/209/date_to_date/607/status/submitted/association/super-admin?page=0&size=10&sort=id,desc`, "GET",{});
+};
+
+export const getApprovedsheetdata = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService (`timesheet/209/date_to_date/607/status/approved/association/super-admin?page=0&size=10&sort=id,desc`, "GET",{});
+};
+
+export const getPendingsheetdata = async ()=>{
+  const id = await AsyncStorage.getItem ("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/date_to_date/607/status/inprogress/association/super-admin?page=0&size=10&sort=id,desc`, "GET",{});
+};
+ export const getRejectedsheetdata = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/date_to_date/607/status/rejected/association/super-admin?page=0&size=10&sort=id,desc`,"GET",{});
+ };
+
+ export const getRecalledsheetdata = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService (`timesheet/209/date_to_date/607/status/recall%20Requested/association/super-admin?page=0&size=10&sort=id,desc`,"GET",{})
+ };
+
+export const getTimesheetsettingsdata = async ()=>{
+const id = await AsyncStorage.getItem("id");
+const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/timesheet_notification_settings/by-org-id`,"GET", {});
+};
+
+
+export const getOrganizationalSettingsdata = async()=>{
+const id = await AsyncStorage.getItem("id"); 
+const orgId = await AsyncStorage.getItem("orgId");
+return await handleApiRequestAfterLoginService(`organization/orgId/209`,"GET",{});
+};
+
+
+
+
+export const getOrganizationalSettingsdatas = async (data)=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId =await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`organization/209`,"PUT",data);
+};
+
+
+export const getTimesheetsettingspatch = async (data)=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+    return await handleApiRequestAfterLoginService(`timesheet/209/timesheet_notification_settings/13`,"PUT", data);
+  };
+ 
+  export const getTimesheetsettingsgetcall = async ()=>{
+    const id = await AsyncStorage.getItem("id");
+    const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/recall_settings/607/association/408`,"GET",{});
+}
+  
+export const getTimesheetsettingsputcall = async (data)=>{
+  console.log("data", data);
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+return await handleApiRequestAfterLoginService(`timesheet/209/recall_settings/607/11`,"PUT",{data});
+}
+
+export const getTimesheetsdatacall = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/date_to_date/2/2025?page=0&size=10&sort=id,desc`,"GET",{})
+};
+
+
+export const getProjectdetailsdata = async ()=>{
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/209/project/employee/status/all/search?page=0&size=10&sort=id,desc`,"POST",{});
+};
+
+export const getactiveprojectdetailsdata = async (status)=>{
+const id = await AsyncStorage.getItem("id");
+const orgId = await AsyncStorage.getItem("orgId");
+return await handleApiRequestAfterLoginService(`timesheet/209/project/employee/status/${status}/search?page=0&size=10&sort=id,desc`, "POST",{});
+}

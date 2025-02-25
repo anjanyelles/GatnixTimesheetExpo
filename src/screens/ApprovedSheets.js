@@ -1,52 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
+import { getApprovedsheetdata } from './aftherlogin';
 
 const ApprovedSheets = () => {
-  // Sample data for the table
-  const allData = [
-    {
-      id: 'T011253',
-      employeeName: 'Vishwa Tejaaaa',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '45.0',
-      client: 'Gatnix Time sheets',
-      endClient: 'Infosyc',
-      status: 'Submitted',
-      comments: 'Timesheet ...',
-    },
-    {
-      id: 'T011254',
-      employeeName: 'John Doe',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '40.0',
-      client: 'Global Tech',
-      endClient: 'TechCorp',
-      status: 'Approved',
-      comments: 'Approved by manager',
-    },
-    {
-      id: 'T011255',
-      employeeName: 'Jane Smith',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '35.0',
-      client: 'XZY Solutions',
-      endClient: 'TechHive',
-      status: 'Pending',
-      comments: 'Pending approval',
-    },
-    {
-      id: 'T011256',
-      employeeName: 'Alex Johnson',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '42.0',
-      client: 'InovaTech',
-      endClient: 'BizCorp',
-      status: 'Rejected',
-      comments: 'Rejected by manager',
-    },
-    // Add more data as needed
-  ];
+  const [allData, setAllData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Number of items per page
+  const [displayedData, setDisplayedData] = useState([]);
 
+  // Sample table headers
   const tableHeaders = [
     'T.ID',
     'Employee Name',
@@ -58,37 +20,60 @@ const ApprovedSheets = () => {
     'Comments',
   ];
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Number of items per page
-  const [displayedData, setDisplayedData] = useState(allData.slice(0, itemsPerPage));
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchApprovedSheetdata = async () => {
+      try {
+        const response = await getApprovedsheetdata();
+        console.log(response.data[0].startDate); // Debugging output
 
-  // Load more data when user goes to the next page
-  const loadDataForPage = (page) => {
-    const startIndex = (page - 1) * itemsPerPage;
+        if (response?.data) {
+          const formattedData = response.data.map((item, index) => ({
+            sheetId: item.sheetId || '',
+            employeeName: item.employeeName || '',
+            period: `${new Date(item.startDate * 1000).toLocaleDateString()} - ${new Date(item.endDate * 1000).toLocaleDateString()}`,
+            totalHours: item.billableHours || '',
+            client: item.clientName || '',
+            endClient: item.endClientName || '',
+            status: item.status || '',
+            comments: item.comments.length > 0 ? item.comments[0].comment : '',
+          }));
+
+          setAllData(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchApprovedSheetdata();
+  }, []);
+
+  // Load data for pagination
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
     const newData = allData.slice(startIndex, startIndex + itemsPerPage);
     setDisplayedData(newData);
-    setCurrentPage(page);
-  };
+  }, [currentPage, allData]);
 
   // Handle "Next" button click
   const nextPage = () => {
-    if ((currentPage * itemsPerPage) < allData.length) {
-      loadDataForPage(currentPage + 1);
+    if (currentPage * itemsPerPage < allData.length) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
   // Handle "Previous" button click
   const prevPage = () => {
     if (currentPage > 1) {
-      loadDataForPage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
   // Render a single row in the table
   const renderRow = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
+      <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
       <Text style={styles.cell}>{item.period}</Text>
       <Text style={styles.cell}>{item.totalHours}</Text>
@@ -101,7 +86,7 @@ const ApprovedSheets = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ApprovedSheets Time Sheets</Text>
+      <Text style={styles.title}>Approved Sheets Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>
