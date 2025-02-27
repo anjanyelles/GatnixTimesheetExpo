@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 
-const Timesheetpage = () => {
-  const allData = [
-    { id: 'T011253', employeeName: 'Vishwa Tejaaaa', period: '2025-01-12 / 2025-01-18', totalHours: '45.0', status: 'Submitted' },
-    { id: 'T011254', employeeName: 'John Doe', period: '2025-01-12 / 2025-01-18', totalHours: '40.0', status: 'Approved' },
-    { id: 'T011255', employeeName: 'Jane Smith', period: '2025-01-19 / 2025-01-25', totalHours: '35.0', status: 'Pending' },
-    { id: 'T011256', employeeName: 'Alex Johnson', period: '2025-01-19 / 2025-01-25', totalHours: '42.0', status: 'Rejected' },
-  ];
+const ProjectDetails = () => {
+ 
 
   const activeData = allData.filter(item => item.status === 'Approved');
   const inactiveData = allData.filter(item => item.status === 'Rejected');
   const [selectedTab, setSelectedTab] = useState('All Projects');
+  const [allData , setAllData]=useState([])
+  
 
   const renderRow = ({ item }) => (
     <View style={styles.row}>
@@ -156,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Timesheetpage;
+export default ProjectDetails;

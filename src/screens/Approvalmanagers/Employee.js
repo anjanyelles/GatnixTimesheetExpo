@@ -14,8 +14,10 @@ const Employee = () => {
     const fetchEmployees = async (status="ALL") => {
       try {
         setLoading(true); // Show loading indicator
+
         const response = await getEmplyeedata(status);
           console.log("respose", response)
+
         if (response?.data) {
           setEmployees(response.data);
         } else {

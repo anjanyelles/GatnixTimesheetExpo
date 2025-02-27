@@ -1,11 +1,14 @@
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Button, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { handelUpdateAppreveTimeSheet } from './aftherlogin';
 
+
 const ApprovedSheets = () => {
   const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 2; // Number of items per page
   const navigation = useNavigation();
 
@@ -27,10 +30,66 @@ const ApprovedSheets = () => {
     return allData.slice(startIndex, startIndex + itemsPerPage);
   };
 
+  const itemsPerPage = 6; // Number of items per page
+  const [displayedData, setDisplayedData] = useState([]);
+
+  // Sample table headers
+  const tableHeaders = [
+    'T.ID',
+    'Employee Name',
+    'Period',
+    'Total Hours',
+    'Client',
+    'End Client',
+    'Status',
+    'Comments',
+  ];
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchApprovedSheetdata = async () => {
+      try {
+        const response = await getApprovedsheetdata();
+        console.log(response.data[0].startDate); // Debugging output
+
+        if (response?.data) {
+          const formattedData = response.data.map((item, index) => ({
+            sheetId: item.sheetId || '',
+            employeeName: item.employeeName || '',
+            period: `${new Date(item.startDate * 1000).toLocaleDateString()} - ${new Date(item.endDate * 1000).toLocaleDateString()}`,
+            totalHours: item.billableHours || '',
+            client: item.clientName || '',
+            endClient: item.endClientName || '',
+            status: item.status || '',
+            comments: item.comments.length > 0 ? item.comments[0].comment : '',
+          }));
+
+          setAllData(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchApprovedSheetdata();
+  }, []);
+
+  // Load data for pagination
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const newData = allData.slice(startIndex, startIndex + itemsPerPage);
+    setDisplayedData(newData);
+  }, [currentPage, allData]);
+
+
   const displayedData = loadDataForPage(currentPage);
 
   const nextPage = () => {
+
     if ((currentPage * itemsPerPage) < allData.length) {
+
+    if (currentPage * itemsPerPage < allData.length) {
+
       setCurrentPage(currentPage + 1);
     }
   };
@@ -38,6 +97,7 @@ const ApprovedSheets = () => {
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+
     }
   };
 
@@ -57,6 +117,7 @@ const ApprovedSheets = () => {
         return styles.statusSubmitted;
       default:
         return styles.statusDefault;
+
     }
   };
 
@@ -65,7 +126,11 @@ const ApprovedSheets = () => {
   };
 
   const renderRow = ({ item }) => (
+
     <TouchableOpacity onPress={() => handleRowPress(item)} style={styles.row}>
+
+    <View style={styles.row}>
+
       <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
       <Text style={styles.cell}>
@@ -81,7 +146,11 @@ const ApprovedSheets = () => {
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>Approved Time Sheets</Text>
+
+      <Text style={styles.title}>Approved Sheets Time Sheets</Text>
+
 
       <ScrollView horizontal>
         <View>

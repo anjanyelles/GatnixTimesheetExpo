@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { View, Text, TextInput, StyleSheet, FlatList, ScrollView, TouchableOpacity, ActivityIndicator ,Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { handleDeleteUser, handlegetAllClinetDataApi } from '../aftherlogin';
@@ -12,6 +13,12 @@ const EmployeeSuperadmin = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [allData, setAllData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]); // Ensure it's an empty array initially
+  const [allData, setAllData] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);  const [selectedId, setSelectedId]=useState()
@@ -50,8 +57,38 @@ const EmployeeSuperadmin = ({navigation}) => {
     fetchClientData(currentPage);
   }, [currentPage]);
 
+  useEffect(() => {
+    const fetchClientSuperadmindata = async () => {
+      try {
+        const response = await getClientSuperadmindata();
+        if (response?.data) {
+          const formattedData = response.data.map((item, index) => ({
+            id: `${index + 1}`,
+            clientName: item.clientName || '',
+            clientEmail: item.clientBillingEmail || '',
+            phone: item.clientPhoneNumber || '',
+            endClient: item.endClientName || '',
+            endClientEmail: item.endClientEmail || '',
+          }));
+
+          console.log('Formatted Data:', formattedData);
+          setAllData(formattedData);
+          setFilteredData(formattedData); // Initialize filteredData with allData
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchClientSuperadmindata();
+  }, []);
+
   const handleSearch = (text) => {
     setSearchQuery(text);
+    if (!text) {
+      setFilteredData(allData); // Reset to all data if search is empty
+      return;
+    }
+
     const filtered = allData.filter(
       (item) =>
         item.clientName.toLowerCase().includes(text.toLowerCase()) ||
@@ -61,6 +98,15 @@ const EmployeeSuperadmin = ({navigation}) => {
     setCurrentPage(1);
     setTotalPages(Math.ceil(filtered.length / itemsPerPage));
   };
+
+
+  const loadDataForPage = (page) => {
+    if (!filteredData.length) return []; // Prevent slice on undefined
+    const startIndex = (page - 1) * itemsPerPage;
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const displayedData = loadDataForPage(currentPage);
 
   const nextPage = () => {
     if (currentPage < totalPages) {
@@ -122,7 +168,11 @@ const EmployeeSuperadmin = ({navigation}) => {
       <Text style={styles.cell}>{item.id}</Text>
       <Text style={styles.cell}>{item.clientName}</Text>
       <Text style={styles.cell}>{item.clientEmail}</Text>
+
       <Text style={styles.cell}>{item.phoneNumber}</Text>
+
+      <Text style={styles.cell}>{item.phone}</Text>
+
       <Text style={styles.cell}>{item.endClient}</Text>
       <Text style={styles.cell}>{item.endClientEmail}</Text>
       <View style={styles.actionCell}>
@@ -179,9 +229,21 @@ const EmployeeSuperadmin = ({navigation}) => {
         <TouchableOpacity onPress={prevPage} disabled={currentPage === 1}>
           <Text style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}>Prev</Text>
         </TouchableOpacity>
+
         <Text style={styles.paginationText}>Page {currentPage} of {totalPages}</Text>
         <TouchableOpacity onPress={nextPage} disabled={currentPage === totalPages}>
           <Text style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}>Next</Text>
+
+        <TouchableOpacity onPress={nextPage} disabled={currentPage * itemsPerPage >= filteredData.length}>
+          <Text
+            style={[
+              styles.paginationButton,
+              currentPage * itemsPerPage >= filteredData.length && styles.disabledButton,
+            ]}
+          >
+            Next
+          </Text>
+
         </TouchableOpacity>
       </View>
     </View>
