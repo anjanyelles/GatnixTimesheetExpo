@@ -108,7 +108,7 @@ const ApprovalManager = () => {
           />
         </View>
       </ScrollView>
-    </View>
+    </View>   
   );
 };
 
