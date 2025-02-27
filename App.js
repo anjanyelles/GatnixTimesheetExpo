@@ -24,7 +24,6 @@ import EmployeeSuperadmin from './src/screens/Superadmin/ClientSuperadmin';
 import SignInScreen from './src/SignInScreen';
 import Otp from './src/screens/Otp';
 import TableContiner from './src/screens/TableContiner';
-
 import AddEducationDetails from './src/screens/AddEducationDetails';
 import Projectscreen from './src/screens/Projectscreen';
 import EmployeeFormModal from './src/screens/EmployeeFormModal';
@@ -33,10 +32,8 @@ import ClientNewdataForm from './src/screens/Superadmin/ClientNewdataForm';
 import Addapprovalmanager from './src/screens/Approvalmanager/Addapprovalmanager';
 import TimesheetsSettings from './src/screens/Superadmin/TimesheetsSettings';
 import OrganizationalSettings from './src/screens/Superadmin/OrganizationalSettings';
-import OrganisationSettings from './src/screens/Superadmin/OrganizationalSettings';
 import ProjectDetails from './src/screens/ProjectDetails';
 import TimeSheetpagetable from './src/screens/TimeSheetpagetable';
-
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -45,102 +42,49 @@ const DrawerNavigator = () => (
   <Drawer.Navigator
     drawerContent={(props) => <CustomDrawerContent {...props} />}
     screenOptions={{
-      headerShown: true, // Disable headers for drawer screens
+      headerShown: true,
       drawerStyle: {
-        width: 240, // Set custom drawer width
+        width: 240,
       },
     }}
   >
-
-   
-   {/* <Drawer.Screen name="EmployeeFormModal" component={EmployeeFormModal} /> */}
-   
-   <Drawer.Screen name="ApprovalManager" component={ApprovalManager} />
-   <Drawer.Screen name="Addapprovalmanager" component={Addapprovalmanager} />
-
-   
-   <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} />
-   <Drawer.Screen name="ClientEditForm" component={ClientEditForm} />
-   <Drawer.Screen name="ClientNewdataForm" component={ClientNewdataForm} />
-   
-
-   <Drawer.Screen name="Employee" component={Employee} />
     <Drawer.Screen name="Dashboard" component={Dashboard} />
-
-
-
-   <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
-   <Drawer.Screen name="Projectscreen" component={Projectscreen} />
-        <Drawer.Screen name="AddEducation" component={AddEducationDetails} />
-        <Drawer.Screen name="ProfilePage" component={ProfilePage} />
-    <Drawer.Screen name="TableContiner" component={TableContiner} />
-    
-        <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
-
-        
-    <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
-
-
-
-
-{/* <Drawer.Screen name="ProjectDetails" component={ProjectDetails} /> */}
-
-<Drawer.Screen name="Project" component={Project} />
-
-<Drawer.Screen name="TimeSheetpagetable" component={TimeSheetpagetable} />
-
-<Drawer.Screen name="OrganisationSettings" component={OrganisationSettings} />
-
-<Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
-
-
-
-
+    <Drawer.Screen name="ApprovalManager" component={ApprovalManager} />
+    <Drawer.Screen name="Addapprovalmanager" component={Addapprovalmanager} />
+    <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} />
+    <Drawer.Screen name="ClientEditForm" component={ClientEditForm} />
+    <Drawer.Screen name="ClientNewdataForm" component={ClientNewdataForm} />
+    <Drawer.Screen name="Employee" component={Employee} />
     <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
     <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
-    <Drawer.Screen name="Dashboard" component={Dashboard} />
-    <Drawer.Screen name ="OrganizationalSettings" component={OrganizationalSettings} />
-    {/* <Drawer.Screen name ="TimesheetsSettings" component={TimesheetsSettings}/> */}
-    <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
-    <Drawer.Screen name="TableContiner" component={TableContiner} />
-    {/* <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} /> */}
-
     <Drawer.Screen name="PendingSheets" component={PendingSheets} />
     <Drawer.Screen name="RejectedSheets" component={RejectedSheets} />
     <Drawer.Screen name="RecalledSheets" component={RecalledSheets} />
-
+    <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
+    <Drawer.Screen name="TimeSheetpagetable" component={TimeSheetpagetable} />
+    <Drawer.Screen name="OrganisationSettings" component={OrganizationalSettings} />
+    <Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
+    <Drawer.Screen name="ProfilePage" component={ProfilePage} />
     <Drawer.Screen name="EditProfile" component={EditProfile} />
-    {/* Approval Managers */}
+    <Drawer.Screen name="TableContiner" component={TableContiner} />
+    <Drawer.Screen name="AddEducation" component={AddEducationDetails} />
+    <Drawer.Screen name="Projectscreen" component={Projectscreen} />
     <Drawer.Screen name="Client" component={Client} />
-
     <Drawer.Screen name="Project" component={Project} />
-
-    {/* <Drawer.Screen name="Project" component={Project} /> */}
-    <Drawer.Screen name="Employee" component={Employee} />
-
-    {/* Superadmin */}
-    {/* <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} /> */}
- 
     <Drawer.Screen name="EmployeeSuperadmin" component={EmployeeSuperadmin} />
   </Drawer.Navigator>
 );
 
-// Main App
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Authentication Screens */}
-     
         <Stack.Screen name="Main" component={DrawerNavigator} />
         <Stack.Screen name="SignInScreen" component={SignInScreen} />
-
         <Stack.Screen name="Otp" component={Otp} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="MultipleLogin" component={MultipleLogin} />
-        {/* Main App Drawer */}
-        {/* <Stack.Screen name="Main" component={DrawerNavigator} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

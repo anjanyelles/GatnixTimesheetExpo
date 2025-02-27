@@ -6,12 +6,6 @@ import { Button, Switch } from 'react-native-paper';
 import axios from 'axios';
 
 const ApprovalManager = ({navigation}) => {
-
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getApprovalManagerdata } from '../aftherlogin';
-
-
   const [selectedTab, setSelectedTab] = useState('All Employees');
   const [allData, setAllData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -188,7 +182,6 @@ import { getApprovalManagerdata } from '../aftherlogin';
     setPage(0); // Reset to the first page when switching tabs
   }, [selectedTab]);
 
-
   const getFilteredData = () => {
     return allData.filter(
       (item) =>
@@ -204,49 +197,10 @@ import { getApprovalManagerdata } from '../aftherlogin';
     const filteredData = getFilteredData();
     const startIndex = page * pageSize;
     return filteredData.slice(startIndex, startIndex + pageSize);
-
-  useEffect(() => {
-    const fetchApprovalManagerData = async () => {
-      try {
-        const response = await getApprovalManagerdata();
-        if (response?.data) {
-          
-          const formattedData = response.data.map((item, index) => ({
-            id: `${index + 1}`, // Ensure ID is a string
-            firstName: item.firstName || '',
-            lastName: item.lastName || '',
-            email: item.email || '',
-            phone: item.mobile || '',
-          }));
-          console.log("formattedData",formattedData)
-          setAllData(formattedData); // ✅ Update allData with API response
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchApprovalManagerData();
-  }, []);
-
-  const getFilteredData = () => {
-    if (!searchQuery) return allData; // Return all data if search is empty
-
-    return allData.filter((item) =>
-      [item.firstName, item.lastName, item.email, item.phone, String(item.id)] // Ensure ID is a string
-        .filter(Boolean) // Remove undefined/null values
-        .some((field) => field.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-
   };
-
-  const handleEdit = (id) => console.log(`Edit employee with ID: ${id}`);
-  const handleView = (id) => console.log(`View employee with ID: ${id}`);
-  const handleDelete = (id) => console.log(`Delete employee with ID: ${id}`);
 
   const renderRow = ({ item, index }) => (
     <View style={styles.row}>
-
       <Text style={styles.cell}>{index + 1 + page * pageSize}</Text>
       <Text style={styles.cell}>{item.firstName}</Text>
       <Text style={styles.cell}>{item.lastName}</Text>
@@ -259,12 +213,6 @@ import { getApprovalManagerdata } from '../aftherlogin';
   color="#4CAF50"
 />
       </View>
-
-      <Text style={styles.cell}>{index + 1}</Text> 
-      <Text style={styles.cell}>{item.firstName}</Text>
-      <Text style={styles.cell}>{item.lastName}</Text>
-      <Text style={styles.cell}>{item.email}</Text>
-      <Text style={styles.cell}>{item.phone}</Text>
       <View style={styles.actionButtons}>
         <TouchableOpacity onPress={() => console.log(`Edit employee with ID: ${item.id}`)}>
           <Ionicons name="create" size={20} color="#FFC107" style={styles.icon} />
@@ -278,20 +226,17 @@ import { getApprovalManagerdata } from '../aftherlogin';
 
   return (
     <View style={styles.container}>
-
-      <Text style={styles.title}>Employee</Text>
+      <Text style={styles.title}>Approval Manager</Text>
      
-
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
         <TextInput
           style={styles.searchBar}
-          placeholder="Search by Name, Email, Phone, or ID"
+          placeholder="Search by Name, Period, Status, or ID"
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
         />
       </View>
-
       
       <Button style={styles.smallButton} onPress={() => navigation.navigate('Addapprovalmanager')}>
         <Text style={styles.smallButtonText}>
@@ -306,15 +251,6 @@ import { getApprovalManagerdata } from '../aftherlogin';
             style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
             onPress={() => setSelectedTab(tab)}
           >
-
-
-      <View style={styles.buttonRow}>
-        {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
-            onPress={() => setSelectedTab(tab)}>
-
             <Text style={styles.buttonText}>{tab}</Text>
           </TouchableOpacity>
         ))}
@@ -331,14 +267,12 @@ import { getApprovalManagerdata } from '../aftherlogin';
           <FlatList
             data={paginatedData()}
             renderItem={renderRow}
-
             keyExtractor={(item) => item.id.toString()}
             ListEmptyComponent={
               <View style={styles.noDataContainer}>
                 <Text style={styles.noDataText}>No Data Found</Text>
               </View>
             }
-
           />
         </View>
       </ScrollView>

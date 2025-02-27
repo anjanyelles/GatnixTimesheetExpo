@@ -40,9 +40,9 @@ const Employee = () => {
     // Set the correct status based on the selected tab
     if (tab === 'All Employees') {
       status = 'All';
-    } else if (tab === 'Active Employees') {
+    } else if (tab === 'Active') {
       status = true;
-    } else if (tab === 'Inactive Employees') {
+    } else if (tab === 'InActive') {
       status = false;
     }
   
@@ -128,7 +128,7 @@ const Employee = () => {
 
       {/* Tab Buttons */}
       <View style={styles.buttonRow}>
-  {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
+  {['All Employees', 'Active', 'InActive'].map((tab) => (
     <TouchableOpacity
       key={tab}
       style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
