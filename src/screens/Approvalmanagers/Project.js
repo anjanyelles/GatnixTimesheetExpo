@@ -70,6 +70,8 @@ const Project = () => {
       fetchProjects("active");  
     } else if (selectedTab === "Inactive Projects") {
       fetchProjects("closed"); 
+    }else{
+      fetchProjects("all")
     }
   
   }, [selectedTab]);   

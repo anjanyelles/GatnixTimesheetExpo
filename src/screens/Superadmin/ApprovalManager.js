@@ -80,7 +80,7 @@ const ApprovalManager = () => {
       </View>
 
       <View style={styles.buttonRow}>
-        {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
+        {['All Employees', 'Active', 'InActive'].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
