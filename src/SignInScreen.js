@@ -7,7 +7,7 @@ import { Snackbar } from 'react-native-paper'; // Import Snackbar for custom mes
 import MultipleLogin from "./screens/MultipleLogin";
 
 export default function SignInScreen({ navigation }) {
-  const [email, setEmail] = useState("tejavishwa012@gmail.com");
+  const [email, setEmail] = useState("dineshkolluru98@gmail.com");
   const [password, setPassword] = useState("Test@123");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [snackMessage, setSnackMessage] = useState(""); // For Snackbar message
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   signUpButton: {
-    backgroundColor: "#5A55CA",
+    backgroundColor: "#FF6F20",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   signInLink: {
-    color: "#5A55CA",
+    color: "#FF6F20",
     fontWeight: "bold",
   },
   snackbarSuccess: {

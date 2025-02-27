@@ -1,10 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
-import { getApprovedsheetdata } from './aftherlogin';
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { handelUpdateAppreveTimeSheet } from './aftherlogin';
+
 
 const ApprovedSheets = () => {
   const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const itemsPerPage = 2; // Number of items per page
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await handelUpdateAppreveTimeSheet();
+        console.log("Response:", response.data);
+        setAllData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const loadDataForPage = (page) => {
+    const startIndex = (page - 1) * itemsPerPage;
+    return allData.slice(startIndex, startIndex + itemsPerPage);
+  };
+
   const itemsPerPage = 6; // Number of items per page
   const [displayedData, setDisplayedData] = useState([]);
 
@@ -56,41 +81,79 @@ const ApprovedSheets = () => {
     setDisplayedData(newData);
   }, [currentPage, allData]);
 
-  // Handle "Next" button click
+
+  const displayedData = loadDataForPage(currentPage);
+
   const nextPage = () => {
+
+    if ((currentPage * itemsPerPage) < allData.length) {
+
     if (currentPage * itemsPerPage < allData.length) {
+
       setCurrentPage(currentPage + 1);
     }
   };
 
-  // Handle "Previous" button click
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+
     }
   };
 
-  // Render a single row in the table
+  const tableHeaders = [
+    'T.ID', 'Employee Name', 'Period', 'Total Hours', 'Client', 'End Client', 'Status', 'Comments'
+  ];
+
+  const getStatusStyle = (status) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return styles.statusApproved;
+      case 'pending':
+        return styles.statusPending;
+      case 'rejected':
+        return styles.statusRejected;
+      case 'submitted':
+        return styles.statusSubmitted;
+      default:
+        return styles.statusDefault;
+
+    }
+  };
+
+  const handleRowPress = (item) => {
+    navigation.navigate('Projectscreen', { projectId: item.projectId });
+  };
+
   const renderRow = ({ item }) => (
+
+    <TouchableOpacity onPress={() => handleRowPress(item)} style={styles.row}>
+
     <View style={styles.row}>
+
       <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
-      <Text style={styles.cell}>{item.period}</Text>
-      <Text style={styles.cell}>{item.totalHours}</Text>
-      <Text style={styles.cell}>{item.client}</Text>
-      <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
-      <Text style={styles.cell}>{item.comments}</Text>
-    </View>
+      <Text style={styles.cell}>
+        {new Date(item.startDate * 1000).toLocaleDateString()} / {new Date(item.endDate * 1000).toLocaleDateString()}
+      </Text>
+      <Text style={styles.cell}>{item.billableHours}</Text>
+      <Text style={styles.cell}>{item.clientName}</Text>
+      <Text style={styles.cell}>{item.endClientName}</Text>
+      <Text style={[styles.cell, getStatusStyle(item.status)]}>{item.status}</Text>
+      <Text style={styles.cell}>{item.comments?.[item.comments.length - 1]?.comment || 'No comments'}</Text>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+
+      <Text style={styles.title}>Approved Time Sheets</Text>
+
       <Text style={styles.title}>Approved Sheets Time Sheets</Text>
+
 
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={[styles.row, styles.header]}>
             {tableHeaders.map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
@@ -99,7 +162,6 @@ const ApprovedSheets = () => {
             ))}
           </View>
 
-          {/* Table Data */}
           <FlatList
             data={displayedData}
             renderItem={renderRow}
@@ -108,18 +170,9 @@ const ApprovedSheets = () => {
         </View>
       </ScrollView>
 
-      {/* Pagination Controls */}
       <View style={styles.paginationWrapper}>
-        <Button
-          title="Prev"
-          onPress={prevPage}
-          disabled={currentPage === 1} // Disable if on the first page
-        />
-        <Button
-          title="Next"
-          onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
-        />
+        <Button title="Prev" onPress={prevPage} disabled={currentPage === 1} />
+        <Button title="Next" onPress={nextPage} disabled={currentPage * itemsPerPage >= allData.length} />
       </View>
     </View>
   );
@@ -149,7 +202,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
-    width: 120, // Equal width for header cells
+    width: 120,
     padding: 4,
   },
   row: {
@@ -164,13 +217,48 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     paddingHorizontal: 5,
-    width: 120, // Equal width for data cells
+    width: 120,
   },
   paginationWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
     marginTop: 10,
+  },
+  statusApproved: {
+    backgroundColor: 'green',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusPending: {
+    backgroundColor: 'orange',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusRejected: {
+    backgroundColor: 'red',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusSubmitted: {
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusDefault: {
+    backgroundColor: 'gray',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
   },
 });
 

@@ -9,13 +9,15 @@ const Employee = () => {
   const [employees, setEmployees] = useState([]); // Store employee data from API
   const [loading, setLoading] = useState(true); // Loading state for API call
 
+
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchEmployees = async (status="ALL") => {
       try {
         setLoading(true); // Show loading indicator
-        const response = await getEmplyeedata();
-        
-        console.log("response",response)
+
+        const response = await getEmplyeedata(status);
+          console.log("respose", response)
+
         if (response?.data) {
           setEmployees(response.data);
         } else {
@@ -28,10 +30,40 @@ const Employee = () => {
       }
     };
 
-    fetchEmployees();
+    fetchEmployees("ALL");
   }, []);
 
 
+  const handelActive = async (tab) => {
+    let status;
+    
+    // Set the correct status based on the selected tab
+    if (tab === 'All Employees') {
+      status = 'All';
+    } else if (tab === 'Active Employees') {
+      status = true;
+    } else if (tab === 'Inactive Employees') {
+      status = false;
+    }
+  
+    try {
+      setLoading(true); // Show loading indicator
+      const response = await getEmplyeedata(status);
+      
+      console.log('Response:', response);
+      
+      if (response?.data) {
+        setEmployees(response.data);
+      } else {
+        console.error('Invalid API response:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching employee data:', error);
+    } finally {
+      setLoading(false); // Hide loading indicator
+    }
+  };
+  
   
   const getFilteredData = () => {
     return employees.filter(
@@ -96,39 +128,49 @@ const Employee = () => {
 
       {/* Tab Buttons */}
       <View style={styles.buttonRow}>
-        {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
-            onPress={() => setSelectedTab(tab)}>
-            <Text style={styles.buttonText}>{tab}</Text>
-          </TouchableOpacity>
+  {['All Employees', 'Active Employees', 'Inactive Employees'].map((tab) => (
+    <TouchableOpacity
+      key={tab}
+      style={[styles.buttongroup, selectedTab === tab && styles.selectedButton]}
+      onPress={() => {
+        setSelectedTab(tab);
+        handelActive(tab); // Correct function call
+      }}>
+      <Text style={styles.buttonText}>{tab}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
+{loading ? (
+  <ActivityIndicator size="large" color="#007bff" style={{ marginTop: 20 }} />
+) : (
+  <ScrollView horizontal>
+    <View>
+      {/* Table Header */}
+      <View style={[styles.row, styles.header]}>
+        {['S.No', 'First Name', 'Last Name', 'Email', 'Phone No', 'Actions'].map((header, index) => (
+          <Text key={index} style={[styles.cell, styles.headerText]}>
+            {header}
+          </Text>
         ))}
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#007bff" style={{ marginTop: 20 }} />
+      {/* Table Data */}
+      {getFilteredData().length > 0 ? (
+        <FlatList
+          data={getFilteredData()}
+          renderItem={renderRow}
+          keyExtractor={(item) => item.id.toString()}
+        />
       ) : (
-        <ScrollView horizontal>
-          <View>
-            {/* Table Header */}
-            <View style={[styles.row, styles.header]}>
-              {['S.No', 'First Name', 'Last Name', 'Email', 'Phone No', 'Actions'].map((header, index) => (
-                <Text key={index} style={[styles.cell, styles.headerText]}>
-                  {header}
-                </Text>
-              ))}
-            </View>
-
-            {/* Table Data */}
-            <FlatList
-              data={getFilteredData()}
-              renderItem={renderRow}
-              keyExtractor={(item) => item.id.toString()}
-            />
-          </View>
-        </ScrollView>
+        <View style={styles.noDataContainer}>
+          <Text style={styles.noDataText}>No Data Available</Text>
+        </View>
       )}
+    </View>
+  </ScrollView>
+)}
+
     </View>
   );
 };
@@ -222,6 +264,7 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
+
 });
 
 export default Employee;
