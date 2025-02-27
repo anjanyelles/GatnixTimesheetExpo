@@ -1,111 +1,90 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { handelUpdateAppreveTimeSheet } from './aftherlogin';
 
 const ApprovedSheets = () => {
-  // Sample data for the table
-  const allData = [
-    {
-      id: 'T011253',
-      employeeName: 'Vishwa Tejaaaa',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '45.0',
-      client: 'Gatnix Time sheets',
-      endClient: 'Infosyc',
-      status: 'Submitted',
-      comments: 'Timesheet ...',
-    },
-    {
-      id: 'T011254',
-      employeeName: 'John Doe',
-      period: '2025-01-12 / 2025-01-18',
-      totalHours: '40.0',
-      client: 'Global Tech',
-      endClient: 'TechCorp',
-      status: 'Approved',
-      comments: 'Approved by manager',
-    },
-    {
-      id: 'T011255',
-      employeeName: 'Jane Smith',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '35.0',
-      client: 'XZY Solutions',
-      endClient: 'TechHive',
-      status: 'Pending',
-      comments: 'Pending approval',
-    },
-    {
-      id: 'T011256',
-      employeeName: 'Alex Johnson',
-      period: '2025-01-19 / 2025-01-25',
-      totalHours: '42.0',
-      client: 'InovaTech',
-      endClient: 'BizCorp',
-      status: 'Rejected',
-      comments: 'Rejected by manager',
-    },
-    // Add more data as needed
-  ];
-
-  const tableHeaders = [
-    'T.ID',
-    'Employee Name',
-    'Period',
-    'Total Hours',
-    'Client',
-    'End Client',
-    'Status',
-    'Comments',
-  ];
-
-  // Pagination state
+  const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2; // Number of items per page
-  const [displayedData, setDisplayedData] = useState(allData.slice(0, itemsPerPage));
+  const navigation = useNavigation();
 
-  // Load more data when user goes to the next page
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await handelUpdateAppreveTimeSheet();
+        console.log("Response:", response.data);
+        setAllData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const loadDataForPage = (page) => {
     const startIndex = (page - 1) * itemsPerPage;
-    const newData = allData.slice(startIndex, startIndex + itemsPerPage);
-    setDisplayedData(newData);
-    setCurrentPage(page);
+    return allData.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  // Handle "Next" button click
+  const displayedData = loadDataForPage(currentPage);
+
   const nextPage = () => {
     if ((currentPage * itemsPerPage) < allData.length) {
-      loadDataForPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  // Handle "Previous" button click
   const prevPage = () => {
     if (currentPage > 1) {
-      loadDataForPage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
-  // Render a single row in the table
+  const tableHeaders = [
+    'T.ID', 'Employee Name', 'Period', 'Total Hours', 'Client', 'End Client', 'Status', 'Comments'
+  ];
+
+  const getStatusStyle = (status) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return styles.statusApproved;
+      case 'pending':
+        return styles.statusPending;
+      case 'rejected':
+        return styles.statusRejected;
+      case 'submitted':
+        return styles.statusSubmitted;
+      default:
+        return styles.statusDefault;
+    }
+  };
+
+  const handleRowPress = (item) => {
+    navigation.navigate('Projectscreen', { projectId: item.projectId });
+  };
+
   const renderRow = ({ item }) => (
-    <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
+    <TouchableOpacity onPress={() => handleRowPress(item)} style={styles.row}>
+      <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
-      <Text style={styles.cell}>{item.period}</Text>
-      <Text style={styles.cell}>{item.totalHours}</Text>
-      <Text style={styles.cell}>{item.client}</Text>
-      <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
-      <Text style={styles.cell}>{item.comments}</Text>
-    </View>
+      <Text style={styles.cell}>
+        {new Date(item.startDate * 1000).toLocaleDateString()} / {new Date(item.endDate * 1000).toLocaleDateString()}
+      </Text>
+      <Text style={styles.cell}>{item.billableHours}</Text>
+      <Text style={styles.cell}>{item.clientName}</Text>
+      <Text style={styles.cell}>{item.endClientName}</Text>
+      <Text style={[styles.cell, getStatusStyle(item.status)]}>{item.status}</Text>
+      <Text style={styles.cell}>{item.comments?.[item.comments.length - 1]?.comment || 'No comments'}</Text>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ApprovedSheets Time Sheets</Text>
+      <Text style={styles.title}>Approved Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={[styles.row, styles.header]}>
             {tableHeaders.map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
@@ -114,7 +93,6 @@ const ApprovedSheets = () => {
             ))}
           </View>
 
-          {/* Table Data */}
           <FlatList
             data={displayedData}
             renderItem={renderRow}
@@ -123,18 +101,9 @@ const ApprovedSheets = () => {
         </View>
       </ScrollView>
 
-      {/* Pagination Controls */}
       <View style={styles.paginationWrapper}>
-        <Button
-          title="Prev"
-          onPress={prevPage}
-          disabled={currentPage === 1} // Disable if on the first page
-        />
-        <Button
-          title="Next"
-          onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
-        />
+        <Button title="Prev" onPress={prevPage} disabled={currentPage === 1} />
+        <Button title="Next" onPress={nextPage} disabled={currentPage * itemsPerPage >= allData.length} />
       </View>
     </View>
   );
@@ -164,7 +133,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 14,
-    width: 120, // Equal width for header cells
+    width: 120,
     padding: 4,
   },
   row: {
@@ -179,13 +148,48 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     paddingHorizontal: 5,
-    width: 120, // Equal width for data cells
+    width: 120,
   },
   paginationWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
     marginTop: 10,
+  },
+  statusApproved: {
+    backgroundColor: 'green',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusPending: {
+    backgroundColor: 'orange',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusRejected: {
+    backgroundColor: 'red',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusSubmitted: {
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  statusDefault: {
+    backgroundColor: 'gray',
+    color: 'white',
+    padding: 4,
+    borderRadius: 5,
+    textAlign: 'center',
   },
 });
 

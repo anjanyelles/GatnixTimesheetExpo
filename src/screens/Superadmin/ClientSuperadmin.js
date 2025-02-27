@@ -1,105 +1,130 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, FlatList, ScrollView, TouchableOpacity, ActivityIndicator ,Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { handleDeleteUser, handlegetAllClinetDataApi } from '../aftherlogin';
+import ClientEditForm from './ClientEditForm';
+import { Button } from 'react-native-paper';
 
-const EmployeeSuperadmin = () => {
-  const allData = [
-    {
-      id: 'T011253',
-      employeeName: 'Vishwa Tejaaaa',
-      endClient: 'Infosyc',
-      status: 'Submitted',
-      comments: 'Timesheet ...',
-      clientEmail: 'vishwa@gatnix.com',
-    },
-    {
-      id: 'T011254',
-      employeeName: 'John Doe',
-      endClient: 'TechCorp',
-      status: 'Approved',
-      comments: 'Approved by manager',
-      clientEmail: 'john@globaltech.com',
-    },
-    {
-      id: 'T011255',
-      employeeName: 'Jane Smith',
-      endClient: 'TechHive',
-      status: 'Pending',
-      comments: 'Pending approval',
-      clientEmail: 'jane@xyzsolutions.com',
-    },
-    {
-      id: 'T011256',
-      employeeName: 'Alex Johnson',
-      endClient: 'BizCorp',
-      status: 'Rejected',
-      comments: 'Rejected by manager',
-      clientEmail: 'alex@inovatech.com',
-    },
-  ];
 
-  const tableHeaders = [
-    'T.ID',
-    'Client Name',
-    'Client Email',
-    'Phone Number',
-    'End Client',
-    'End Client Email',
-    'Action',
-  ];
+const EmployeeSuperadmin = ({navigation}) => {
+  const tableHeaders = ['T.ID', 'Client Name', 'Client Email', 'Phone Number', 'End Client', 'End Client Email', 'Action'];
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState(allData);
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);  const [selectedId, setSelectedId]=useState()
+  const [modalVisible  ,setModalVisible]=useState(false);
+
+  const itemsPerPage = 10;
+
+  const fetchClientData = async (page) => {
+    setLoading(true);
+    try {
+      const response = await handlegetAllClinetDataApi(page, itemsPerPage);
+      console.log("API Response:", response);
+
+      if (response && response.data) {
+        const formattedData = response.data.map((client) => ({
+          id: client.id,
+          clientName: client.clientName,
+          clientEmail: client.clientBillingEmail,
+          phoneNumber: client.clientPhoneNumber,
+          endClient: client.endClientName,
+          endClientEmail: client.endClientEmail,
+        }));
+
+        setAllData(formattedData);
+        setFilteredData(formattedData);
+        setTotalPages(response.metaData.totalPages || 1);
+      }
+    } catch (error) {
+      console.error("Error fetching client data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClientData(currentPage);
+  }, [currentPage]);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
     const filtered = allData.filter(
       (item) =>
-        item.client.toLowerCase().includes(text.toLowerCase()) ||
+        item.clientName.toLowerCase().includes(text.toLowerCase()) ||
         item.clientEmail.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredData(filtered);
     setCurrentPage(1);
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
   };
-
-  const loadDataForPage = (page) => {
-    const startIndex = (page - 1) * itemsPerPage;
-    const newData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-    return newData;
-  };
-
-  const displayedData = loadDataForPage(currentPage);
 
   const nextPage = () => {
-    if (currentPage * itemsPerPage < filteredData.length) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
   const handleEdit = (id) => {
-    console.log(`Edit item with ID: ${id}`);
+ 
+    
+    navigation.navigate('ClientEditForm', { id });
+    // Or if using a modal:
+    setSelectedId(id);
+    setModalVisible(true);
   };
 
+
+
+  
+
   const handleDelete = (id) => {
-    console.log(`Delete item with ID: ${id}`);
+    Alert.alert(
+      "Delete Confirmation",
+      "Are you sure you want to delete this client?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              const response = await handleDeleteUser(id);
+              if(response.message === "Client Has Association With Project"){
+                Alert.alert("You can't Delete this user because", response.message);
+              }
+              Alert.alert(response.message || "Client deleted successfully");
+              console.log(`Delete item with ID: ${id}`);
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete client");
+              console.error("Delete error:", error);
+            }
+          },
+        },
+      ]
+    );
   };
+  
 
   const renderRow = ({ item }) => (
     <View style={styles.row}>
       <Text style={styles.cell}>{item.id}</Text>
-      <Text style={styles.cell}>{item.employeeName}</Text>
+      <Text style={styles.cell}>{item.clientName}</Text>
       <Text style={styles.cell}>{item.clientEmail}</Text>
+      <Text style={styles.cell}>{item.phoneNumber}</Text>
       <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
-      <Text style={styles.cell}>{item.comments}</Text>
+      <Text style={styles.cell}>{item.endClientEmail}</Text>
       <View style={styles.actionCell}>
         <TouchableOpacity onPress={() => handleEdit(item.id)}>
           <Icon name="create-outline" size={20} color="blue" style={styles.actionIcon} />
@@ -114,7 +139,11 @@ const EmployeeSuperadmin = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Client Details</Text>
-
+      <Button style={styles.smallButton}  onPress={() => navigation.navigate('ClientNewdataForm')}>
+        <Text style={styles.smallButtonText}>
+        Add
+        </Text>
+      </Button>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -125,48 +154,42 @@ const EmployeeSuperadmin = () => {
         <Icon name="search-outline" size={20} color="#999" style={styles.searchIcon} />
       </View>
 
-      <ScrollView horizontal>
-        <View>
-          {/* Table Header */}
-          <View style={[styles.row, styles.header]}>
-            {tableHeaders.map((header, index) => (
-              <Text key={index} style={[styles.cell, styles.headerText]}>
-                {header}
-              </Text>
-            ))}
+      {loading ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : (
+        <ScrollView horizontal>
+          <View>
+            <View style={[styles.row, styles.header]}>
+              {tableHeaders.map((header, index) => (
+                <Text key={index} style={[styles.cell, styles.headerText]}>
+                  {header}
+                </Text>
+              ))}
+            </View>
+            <FlatList
+              data={filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+              renderItem={renderRow}
+              keyExtractor={(item, index) => index.toString()}
+            />
           </View>
-
-          {/* Table Data */}
-          <FlatList
-            data={displayedData}
-            renderItem={renderRow}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        </View>
-      </ScrollView>
-
-      {/* Pagination Controls */}
+        </ScrollView>
+      )}
+{modalVisible && <ClientEditForm id={selectedId} onClose={() => setModalVisible(false)} />}
       <View style={styles.paginationWrapper}>
         <TouchableOpacity onPress={prevPage} disabled={currentPage === 1}>
           <Text style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}>Prev</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= filteredData.length}
-        >
-          <Text
-            style={[
-              styles.paginationButton,
-              currentPage * itemsPerPage >= filteredData.length && styles.disabledButton,
-            ]}
-          >
-            Next
-          </Text>
+        <Text style={styles.paginationText}>Page {currentPage} of {totalPages}</Text>
+        <TouchableOpacity onPress={nextPage} disabled={currentPage === totalPages}>
+          <Text style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -180,6 +203,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#333',
   },
+  smallButton: {
+    backgroundColor: 'rgb(108, 108, 108)',
+    display:'flex',
+    paddingVertical: 1,
+    paddingHorizontal: 5,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    width:80,
+    marginBottom:20,
+  },
+  smallButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    width:80,
+  },
+  
+  
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',

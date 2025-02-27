@@ -1,0 +1,7 @@
+# Node.js and React
+node_modules/
+npm-debug.log
+yarn.lock
+build/
+dist/
+.DS_Store

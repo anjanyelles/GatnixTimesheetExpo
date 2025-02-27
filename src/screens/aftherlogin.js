@@ -57,9 +57,64 @@ export const sendWhatsappOtpapi = async (whatsappData, value) => {
   return await handleApiRequestAfterLoginService("send-otp", "POST", { whatsappData, value });
 };
 
-export const getEmplyeedata = async () => {
+export const getEmplyeedata = async (status) => {
   const id = await AsyncStorage.getItem("id");
   const orgId  = await AsyncStorage.getItem("orgId");
-  return await handleApiRequestAfterLoginService(`org-user-association/${orgId}/get-users/userId/${id}/role/employee/status/ALL?page=0&size=10`, "POST", {});
+  return await handleApiRequestAfterLoginService(`org-user-association/${orgId}/get-users/userId/${id}/role/employee/status/${status}?page=0&size=10`, "POST", {});
+};
+
+
+
+export const handelGetProfileData = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`org/${orgId}/user/${id}/user-profile/role/super-admin`, "GET", {});
+};
+
+
+
+
+export const handelUpdateProfileData = async (data) => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`org-user-association/update/${id}`, "PUT", data);
+};
+
+
+
+export const handelUpdateAppreveTimeSheet = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/226/date_to_date/690/status/approved/association/super-admin?page=0&size=10&sort=id,desc`, "GET",);
+};
+
+
+
+
+export const handlegetAllEmpoyeeDataApi = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`226/users?role=approvalManagers&page=0&size=10`, "GET",);
+};
+
+
+export const fetchActiveEmployeesApiData = async (page, pageSize , istrue) => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`226/user-role/approvalManagers/user-status?login_status=${istrue}&page=${page}&size=${pageSize}cs`, "GET",);
+};
+
+
+export const handlegetAllClinetDataApi = async (page, pageSize ) => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/226/clients/search?page=0&size=10`, "POST",{});
+};
+
+
+export const handleDeleteUser = async (deleteId) => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId  = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(`timesheet/226/clients/${deleteId}`, "DELETE");
 };
 
