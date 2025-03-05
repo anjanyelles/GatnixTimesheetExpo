@@ -1,6 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { getOrganizationalSettingsdata, getOrganizationalSettingsdatas } from '../aftherlogin'; // Ensure this API function is correct
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from "react-native";
+import {
+  getOrganizationalSettingsdata,
+  getOrganizationalSettingsdatas,
+} from "../aftherlogin";
 
 const OrganisationSettings = () => {
   const [selected, setSelected] = useState({
@@ -21,7 +31,6 @@ const OrganisationSettings = () => {
           setAllData(response);
           const moduleNames = response?.moduleName || [];
 
-          // Update checkboxes based on API response
           setSelected({
             SAT: moduleNames.includes("sat"),
             TIMESHEET: moduleNames.includes("timesheet"),
@@ -41,19 +50,15 @@ const OrganisationSettings = () => {
     setSelected((prevSelected) => {
       const updatedSelected = { ...prevSelected, [key]: !prevSelected[key] };
 
-      // Generate new moduleName array based on the updated state
       const updatedModuleNames = [];
       if (updatedSelected.SAT) updatedModuleNames.push("sat");
       if (updatedSelected.TIMESHEET) updatedModuleNames.push("timesheet");
       if (updatedSelected.JOB_PORTAL) updatedModuleNames.push("jobPortal");
 
-      // Update allData with new moduleName
       const updatedData = { ...allData, moduleName: updatedModuleNames };
       setAllData(updatedData);
 
-      // Send updated data to API
       sendUpdatedData(updatedData);
-
       return updatedSelected;
     });
   };
@@ -70,110 +75,100 @@ const OrganisationSettings = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Organisation Settings</Text>
 
       <View style={styles.card}>
         <Text style={styles.subHeading}>Product Access</Text>
 
         <View style={styles.checkboxContainer}>
-          {/* SAT Checkbox */}
-          <TouchableOpacity
-            style={[styles.checkboxWrapper, selected.SAT && styles.checked]}
-            onPress={() => toggleCheckbox("SAT")}
-          >
-            <Text style={[styles.checkbox, selected.SAT && styles.checkedText]}>
-              {selected.SAT ? "✔" : " "}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.label}>SAT</Text>
-
-          {/* TIMESHEET Checkbox */}
-          <TouchableOpacity
-            style={[styles.checkboxWrapper, selected.TIMESHEET && styles.checked]}
-            onPress={() => toggleCheckbox("TIMESHEET")}
-          >
-            <Text style={[styles.checkbox, selected.TIMESHEET && styles.checkedText]}>
-              {selected.TIMESHEET ? "✔" : " "}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.label}>TIMESHEET</Text>
-
-          {/* JOB PORTAL Checkbox */}
-          <TouchableOpacity
-            style={[styles.checkboxWrapper, selected.JOB_PORTAL && styles.checked]}
-            onPress={() => toggleCheckbox("JOB_PORTAL")}
-          >
-            <Text style={[styles.checkbox, selected.JOB_PORTAL && styles.checkedText]}>
-              {selected.JOB_PORTAL ? "✔" : " "}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.label}>JOB PORTAL</Text>
+          {["SAT", "TIMESHEET", "JOB_PORTAL"].map((item) => (
+            <View key={item} style={styles.checkboxWrapper}>
+              <TouchableOpacity
+                style={[styles.checkbox, selected[item] && styles.checked]}
+                onPress={() => toggleCheckbox(item)}
+              >
+                <Text
+                  style={[
+                    styles.checkboxText,
+                    selected[item] && styles.checkedText,
+                  ]}
+                >
+                  {selected[item] ? "✔" : " "}
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.label}>{item}</Text>
+            </View>
+          ))}
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-// Styles for React Native (Expo)
+// Styles
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   heading: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#E67E22',
-    marginBottom: 12,
-    textAlign: 'center',
+    fontWeight: "bold",
+  
+    marginBottom: 16,
+    textAlign: "center",
   },
   subHeading: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 14,
-    marginBottom: 8,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
   },
   card: {
-    backgroundColor: '#fff',
-    paddingVertical: 16,
-    paddingHorizontal: 10,
+    backgroundColor: "#fff",
+    padding: 20,
     borderRadius: 8,
-    marginBottom: 20,
-    elevation: 5, // Adds shadow effect for iOS
-    shadowColor: '#000',
+    elevation: 3,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 2,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 10,
   },
   checkboxWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   checkbox: {
-    fontSize: 18,
-    color: '#888',
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: "#ddd",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  checkboxText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#888",
+  },
+  checked: {
+    backgroundColor: "#4CAF50",
+    borderColor: "#4CAF50",
   },
   checkedText: {
-    color: '#4CAF50', // Color for checked text
+    color: "#fff",
   },
   label: {
     fontSize: 16,
-    marginLeft: 8,
-    color: '#333',
-  },
-  checked: {
-    backgroundColor: '#d3ffd8', // Green background when checked
+    color: "#333",
   },
 });
 

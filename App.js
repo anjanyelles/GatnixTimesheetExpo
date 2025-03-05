@@ -12,6 +12,10 @@ import RejectedSheets from './src/screens/RejectedSheets';
 import RecalledSheets from './src/screens/RecalledSheets';
 import ProfilePage from './src/screens/ProfilePage';
 import EditProfile from './src/screens/EditProfile';
+import AddSkillsDetails from './src/screens/AddSkillsDetails';
+import AddEducationDetails from './src/screens/AddEducationDetails';
+import UpdateEducationDetails from './src/screens/UpdateEducationDetails';
+import AddJobDetails from './src/screens/AddJobDetails';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import MultipleLogin from './src/screens/MultipleLogin';
@@ -29,7 +33,7 @@ import OrganizationalSettings from './src/screens/Superadmin/OrganizationalSetti
 import OrganisationSettings from './src/screens/Superadmin/OrganizationalSettings';
 import ProjectDetails from './src/screens/ProjectDetails';
 import TimeSheetpagetable from './src/screens/TimeSheetpagetable';
-
+import Timesheet from './src/screens/Timesheet';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -44,25 +48,30 @@ const DrawerNavigator = () => (
       },
     }}
   >
+    <Drawer.Screen name="Dashboard" component={Dashboard} />
 
-{/* <Drawer.Screen name="ProjectDetails" component={ProjectDetails} /> */}
+    <Drawer.Screen name="ProjectDetails" component={ProjectDetails} />
 
-<Drawer.Screen name="Project" component={Project} />
+    <Drawer.Screen name="Project" component={Project} />
 
-<Drawer.Screen name="TimeSheetpagetable" component={TimeSheetpagetable} />
+    <Drawer.Screen name="TimeSheetpagetable" component={TimeSheetpagetable} />
 
-<Drawer.Screen name="OrganisationSettings" component={OrganisationSettings} />
+    <Drawer.Screen
+      name="OrganisationSettings"
+      component={OrganisationSettings}
+    />
 
-<Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
-
-
-
+    <Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
 
     <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
     <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
-    <Drawer.Screen name="Dashboard" component={Dashboard} />
-    <Drawer.Screen name ="OrganizationalSettings" component={OrganizationalSettings} />
+
+    <Drawer.Screen
+      name="OrganizationalSettings"
+      component={OrganizationalSettings}
+    />
     {/* <Drawer.Screen name ="TimesheetsSettings" component={TimesheetsSettings}/> */}
+    <Drawer.Screen name="Timesheet" component={Timesheet} />
     <Drawer.Screen name="Timesheetpage" component={Timesheetpage} />
     <Drawer.Screen name="TableContiner" component={TableContiner} />
     {/* <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} /> */}
@@ -71,6 +80,10 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="RecalledSheets" component={RecalledSheets} />
     <Drawer.Screen name="ProfilePage" component={ProfilePage} />
     <Drawer.Screen name="EditProfile" component={EditProfile} />
+    <Drawer.Screen name="AddEducationDetails" component={AddEducationDetails} />
+    <Drawer.Screen name="UpdateEducationDetails" component={UpdateEducationDetails} />
+    <Drawer.Screen name="AddJobDetails" component={AddJobDetails} /> 
+    <Drawer.Screen name="AddSkillsDetails" component={AddSkillsDetails} />  
     {/* Approval Managers */}
     <Drawer.Screen name="Client" component={Client} />
     {/* <Drawer.Screen name="Project" component={Project} /> */}

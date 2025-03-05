@@ -106,7 +106,7 @@ const RecalledSheets = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>RecalledSheets Time Sheets</Text>
+      <Text style={styles.title}>Recalled Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>
@@ -133,12 +133,12 @@ const RecalledSheets = () => {
         <Button
           title="Prev"
           onPress={prevPage}
-          disabled={currentPage === 1}  // Disable if on the first page
+          disabled={currentPage === 1} // Disable if on the first page
         />
         <Button
           title="Next"
           onPress={nextPage}
-          disabled={currentPage * itemsPerPage >= allData.length}  // Disable if on the last page
+          disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
         />
       </View>
     </View>

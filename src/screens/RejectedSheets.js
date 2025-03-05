@@ -88,7 +88,7 @@ const RejectedSheets = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>RejectedSheets Time Sheets</Text>
+      <Text style={styles.title}>Rejected Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>

@@ -38,13 +38,28 @@ const TimeSheetpagetable = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Time Sheets</Text>
+
+      <Text style={styles.title}>Time Sheet Monthly Reports</Text>
       <View style={styles.dropdownRow}>
-        <Picker selectedValue={selectedMonth} style={styles.picker} onValueChange={(itemValue) => setSelectedMonth(itemValue)}>
-          {months.map((month) => (<Picker.Item key={month} label={month} value={month} />))}
+        <Picker
+          selectedValue={selectedMonth}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+        >
+          {months.map((month) => (
+            <Picker.Item key={month} label={month} value={month} />
+          ))}
         </Picker>
 
-        <Picker selectedValue={selectedYear} style={styles.picker} onValueChange={(itemValue) => setSelectedYear(itemValue)}>
-          {years.map((year) => (<Picker.Item key={year} label={year} value={year} />))}
+        <Picker
+          selectedValue={selectedYear}
+          style={styles.picker}
+          onValueChange={(itemValue) => setSelectedYear(itemValue)}
+        >
+          {years.map((year) => (
+            <Picker.Item key={year} label={year} value={year} />
+          ))}
         </Picker>
       </View>
 
@@ -69,10 +84,20 @@ const TimeSheetpagetable = ({ navigation }) => {
           {timeSheetData.length > 0 ? (
             timeSheetData.map((row, index) => (
               <View key={index} style={styles.tableRow}>
-                <TouchableOpacity onPress={() => navigation.navigate("ProjectDetails")}>
-                  <Text style={[styles.cell, styles.link]}>{row.projectId}</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ProjectDetails")}
+                >
+                  <Text style={[styles.cell, styles.link]}>
+                    {row.projectId}
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("EmployeeDetails", { employee: row.employee })}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("EmployeeDetails", {
+                      employee: row.employee,
+                    })
+                  }
+                >
                   <Text style={[styles.cell, styles.link]}>{row.employee}</Text>
                 </TouchableOpacity>
                 <Text style={styles.cell}>{row.client}</Text>
@@ -94,17 +119,59 @@ const TimeSheetpagetable = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FAEDE6", padding: 15 },
-  dropdownRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "start",
+    marginBottom: 20,
+    color: "#333",
+  },
+  dropdownRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
   picker: { flex: 1, backgroundColor: "#fff", borderRadius: 5 },
-  buttonRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 15 },
-  button: { backgroundColor: "#333", padding: 10, borderRadius: 5, minWidth: 100, alignItems: "center" },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: "#333",
+    padding: 10,
+    borderRadius: 5,
+    minWidth: 100,
+    alignItems: "center",
+  },
   buttonText: { color: "#fff", fontWeight: "bold" },
-  tableHeaderContainer: { flexDirection: "row", backgroundColor: "#FFA07A", paddingVertical: 10, borderRadius: 5 },
-  headerGroup: { flex: 1, textAlign: "center", fontWeight: "bold", color: "#fff" },
-  tableRow: { flexDirection: "row", backgroundColor: "#fff", paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
+  tableHeaderContainer: {
+    flexDirection: "row",
+    backgroundColor: "#FFA07A",
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  headerGroup: {
+    flex: 1,
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  tableRow: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
   cell: { flex: 1, textAlign: "center", padding: 10, fontSize: 14 },
   link: { color: "blue", textDecorationLine: "underline" },
-  noDataText: { textAlign: "center", marginTop: 20, fontSize: 16, color: "gray" },
+  noDataText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+  },
 });
 
 export default TimeSheetpagetable;

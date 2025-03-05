@@ -86,7 +86,7 @@ const ApprovedSheets = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Approved Sheets Time Sheets</Text>
+      <Text style={styles.title}>Approved Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>

@@ -88,7 +88,7 @@ const PendingSheets = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PendingSheets Time Sheets</Text>
+      <Text style={styles.title}>Pending Time Sheets</Text>
 
       <ScrollView horizontal>
         <View>
@@ -106,7 +106,7 @@ const PendingSheets = () => {
             data={displayedData}
             renderItem={renderRow}
             keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={<Text>No data available</Text>}  // Fallback message
+            ListEmptyComponent={<Text>No data available</Text>} // Fallback message
           />
         </View>
       </ScrollView>

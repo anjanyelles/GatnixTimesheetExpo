@@ -1,43 +1,61 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button, Platform } from 'react-native';
-import { getSubmittedsheetdata } from './aftherlogin';
-
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  Button,
+  Platform,
+} from "react-native";
+import { getSubmittedsheetdata } from "./aftherlogin";
 
 const SubmittedSheets = () => {
-  const [allData, setAllData] = useState([]); 
+  const [allData, setAllData] = useState([]);
   const tableHeaders = [
-    'T.ID', 'Employee Name', 'Period', 'Total Hours', 'Client', 'End Client', 'Status', 'Comments',
+    "T.ID",
+    "Employee Name",
+    "Period",
+    "Total Hours",
+    "Client",
+    "End Client",
+    "Status",
+    "Comments",
   ];
 
   useEffect(() => {
     const fetchSubmissionSheetdata = async () => {
-        try {
-            const response = await getSubmittedsheetdata();
-            console.log(response.data[0].startDate); // Debugging output
+      try {
+        const response = await getSubmittedsheetdata();
+        console.log(response.data[0].startDate); // Debugging output
 
-            if (response?.data) {
-                const formattedData = response.data.map((item, index) => ({
-                    sheetId : item.sheetId || '',
-                    employeeName: item.employeeName || '',
-                    period: `${new Date(item.startDate * 1000).toLocaleDateString()} - ${new Date(item.endDate * 1000).toLocaleDateString()}`,
-                    totalHours: item.billableHours || '',
-                    client: item.clientName || '',
-                    endClient: item.endClientName || '',
-                    status: item.status || '',
-                    comments: item.comments.length > 0 ? item.comments[0].comment : '',
-                }));
+        if (response?.data) {
+          const formattedData = response.data.map((item, index) => ({
+            sheetId: item.sheetId || "",
+            employeeName: item.employeeName || "",
+            period: `${new Date(
+              item.startDate * 1000
+            ).toLocaleDateString()} - ${new Date(
+              item.endDate * 1000
+            ).toLocaleDateString()}`,
+            totalHours: item.billableHours || "",
+            client: item.clientName || "",
+            endClient: item.endClientName || "",
+            status: item.status || "",
+            comments: item.comments.length > 0 ? item.comments[0].comment : "",
+          }));
 
-                setAllData(formattedData);
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
+          setAllData(formattedData);
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchSubmissionSheetdata();
-}, []);
+  }, []);
 
-// Pagination State
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [displayedData, setDisplayedData] = useState([]);
@@ -53,7 +71,7 @@ const SubmittedSheets = () => {
   };
 
   const nextPage = () => {
-    if ((currentPage * itemsPerPage) < allData.length) {
+    if (currentPage * itemsPerPage < allData.length) {
       loadDataForPage(currentPage + 1);
     }
   };
@@ -104,7 +122,11 @@ const SubmittedSheets = () => {
       {/* Pagination Controls */}
       <View style={styles.paginationWrapper}>
         <Button title="Prev" onPress={prevPage} disabled={currentPage === 1} />
-        <Button title="Next" onPress={nextPage} disabled={currentPage * itemsPerPage >= allData.length} />
+        <Button
+          title="Next"
+          onPress={nextPage}
+          disabled={currentPage * itemsPerPage >= allData.length}
+        />
       </View>
     </View>
   );
@@ -115,56 +137,56 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'start',
+    fontWeight: "bold",
+    textAlign: "start",
     marginBottom: 20,
-    color: '#333',
+    color: "#333",
   },
   header: {
-    backgroundColor: '#e5e7eb',
+    backgroundColor: "#e5e7eb",
     borderRadius: 5,
     marginBottom: 5,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   headerText: {
-    color: 'rgb(74, 73, 73)',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "rgb(74, 73, 73)",
+    fontWeight: "bold",
+    textAlign: "center",
     fontSize: 14,
     width: 120,
     padding: 4,
     fontFamily: Platform.select({
-      ios: 'San Francisco',
-      android: 'Roboto',
-      default: 'System',
+      ios: "San Francisco",
+      android: "Roboto",
+      default: "System",
     }),
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
     paddingVertical: 10,
   },
   cell: {
     flex: 1,
     fontSize: 14,
-    textAlign: 'center',
-    color: '#333',
+    textAlign: "center",
+    color: "#333",
     paddingHorizontal: 5,
     fontFamily: Platform.select({
-      ios: 'San Francisco',
-      android: 'Roboto',
-      default: 'System',
+      ios: "San Francisco",
+      android: "Roboto",
+      default: "System",
     }),
     width: 120,
   },
   paginationWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 10,
     marginTop: 10,
   },

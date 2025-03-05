@@ -3,11 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const CustomDrawerContent = (props) => {
   const [showSubMenu, setShowSubMenu] = useState(false);
   const [showSubMenuUser, setshowSubMenuUser] = useState(false);
-  
+
   const [userData, setUserData] = useState();
 
   const toggleSubMenu = () => {
@@ -21,9 +21,9 @@ const CustomDrawerContent = (props) => {
     const fetchUserRole = async () => {
       try {
         const role = await AsyncStorage.getItem("role");
-       
-        alert(role)
-        console.log("role",role)
+
+        alert(role);
+        console.log("role", role);
         setUserData(role); // Update state with retrieved role
       } catch (error) {
         console.error("Error fetching role from AsyncStorage", error);
@@ -32,10 +32,10 @@ const CustomDrawerContent = (props) => {
 
     fetchUserRole(); // Call function when component mounts
   }, []);
-  
+
   return (
     <DrawerContentScrollView {...props}>
-       {userData === "approvalManagers" && (
+      {userData === "approvalManagers" && (
         <>
           {/* Dashboard */}
           <TouchableOpacity
@@ -92,7 +92,6 @@ const CustomDrawerContent = (props) => {
             style={styles.menuItem}
             onPress={() => props.navigation.navigate("TimeSheetpagetable")}
             activeOpacity={0.7}
-            
           >
             <Icon name="time-outline" size={20} color="#333" />
             <Text style={styles.menuText}>Timesheet</Text>
@@ -158,7 +157,7 @@ const CustomDrawerContent = (props) => {
           )}
 
           {/* Help Desk */}
-             <TouchableOpacity
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => props.navigation.navigate("HelpDesk")}
             activeOpacity={0.7}
@@ -176,7 +175,7 @@ const CustomDrawerContent = (props) => {
           </TouchableOpacity>
         </>
       )}
-        {userData === "super-admin" && (
+      {userData === "super-admin" && (
         <>
           {/* Dashboard */}
           <TouchableOpacity
@@ -184,7 +183,7 @@ const CustomDrawerContent = (props) => {
             onPress={() => props.navigation.navigate("Dashboard")}
             activeOpacity={0.7}
           >
-            <Icon name="grid-outline" size={20} color="#333" />
+            <MaterialIcons name="dvr" size={20} color="#333" />
             <Text style={styles.menuText}>Dashboard</Text>
           </TouchableOpacity>
 
@@ -194,23 +193,22 @@ const CustomDrawerContent = (props) => {
             onPress={() => props.navigation.navigate("ProfilePage")}
             activeOpacity={0.7}
           >
-            <Icon name="person-outline" size={20} color="#333" />
+            <MaterialIcons name="person-search" size={20} color="#333" />
             <Text style={styles.menuText}>Profile</Text>
           </TouchableOpacity>
 
-
-
-    {/* Timesheet with Submenu */}
-    <TouchableOpacity
+          {/* Timesheet with Submenu */}
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={toggleSubMenuUser}
             activeOpacity={0.7}
           >
-            <Icon name="time-outline" size={20} color="#333" />
-            <Text style={styles.menuText}>Users
-</Text>
+            <MaterialIcons name="group-add" size={20} color="#333" />
+            <Text style={styles.menuText}>Users</Text>
             <Icon
-              name={showSubMenuUser ? "chevron-up-outline" : "chevron-down-outline"}
+              name={
+                showSubMenuUser ? "chevron-up-outline" : "chevron-down-outline"
+              }
               size={20}
               color="#333"
             />
@@ -224,7 +222,7 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("ApprovalManager")}
                 activeOpacity={0.7}
               >
-                <Icon name="document-text-outline" size={18} color="#666" />
+                <MaterialIcons name="manage-accounts" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Approval Manager</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -232,7 +230,7 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("Employee")}
                 activeOpacity={0.7}
               >
-                <Icon name="checkmark-done-outline" size={18} color="#666" />
+                <MaterialIcons name="person-4" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Employee</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -240,13 +238,15 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("ClientSuperadmin")}
                 activeOpacity={0.7}
               >
-                <Icon name="checkmark-circle-outline" size={18} color="#666" />
+                <MaterialIcons
+                  name="supervised-user-circle"
+                  size={20}
+                  color="#333"
+                />
                 <Text style={styles.subMenuText}>Client</Text>
               </TouchableOpacity>
-
             </View>
           )}
-
 
           {/* Timesheet with Submenu */}
           <TouchableOpacity
@@ -254,8 +254,8 @@ const CustomDrawerContent = (props) => {
             onPress={toggleSubMenu}
             activeOpacity={0.7}
           >
-            <Icon name="time-outline" size={20} color="#333" />
-            <Text style={styles.menuText}>Timesheet</Text>
+            <MaterialIcons name="backup-table" size={20} color="#333" />
+            <Text style={styles.menuText}>Sheet</Text>
             <Icon
               name={showSubMenu ? "chevron-up-outline" : "chevron-down-outline"}
               size={20}
@@ -271,27 +271,29 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("Project")}
                 activeOpacity={0.7}
               >
-                <Icon name="document-text-outline" size={18} color="#666" />
+                <MaterialIcons
+                  name="playlist-add-circle"
+                  size={20}
+                  color="#333"
+                />
                 <Text style={styles.subMenuText}>Project</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => props.navigation.navigate("TimeSheetpagetable")}
-            activeOpacity={0.7}
-          >
-            <Icon name="person-outline" size={20} color="#333" />
-            <Text style={styles.menuText}>Time Sheets</Text>
-          </TouchableOpacity>
-
+                style={styles.menuItem}
+                onPress={() => props.navigation.navigate("TimeSheetpagetable")}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name="work-history" size={20} color="#333" />
+                <Text style={styles.menuText}>Time Sheets</Text>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.subMenuItem}
                 onPress={() => props.navigation.navigate("SubmittedSheets")}
                 activeOpacity={0.7}
               >
-                
-                <Icon name="checkmark-done-outline" size={18} color="#666" />
+                <MaterialIcons name="event-note" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Submitted Sheets</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -299,7 +301,7 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("ApprovedSheets")}
                 activeOpacity={0.7}
               >
-                <Icon name="checkmark-circle-outline" size={18} color="#666" />
+                <MaterialIcons name="event-available" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Approved Sheets</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -307,7 +309,11 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("PendingSheets")}
                 activeOpacity={0.7}
               >
-                <Icon name="hourglass-outline" size={18} color="#666" />
+                <MaterialIcons
+                  name="insert-invitation"
+                  size={20}
+                  color="#333"
+                />
                 <Text style={styles.subMenuText}>Pending Sheets</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -315,7 +321,7 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("RejectedSheets")}
                 activeOpacity={0.7}
               >
-                <Icon name="close-circle-outline" size={18} color="#666" />
+                <MaterialIcons name="event-busy" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Rejected Sheets</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -323,38 +329,36 @@ const CustomDrawerContent = (props) => {
                 onPress={() => props.navigation.navigate("RecalledSheets")}
                 activeOpacity={0.7}
               >
-                <Icon name="reload-outline" size={18} color="#666" />
+                <MaterialIcons name="event-repeat" size={20} color="#333" />
                 <Text style={styles.subMenuText}>Recalled Sheets</Text>
               </TouchableOpacity>
             </View>
           )}
-<TouchableOpacity
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => props.navigation.navigate("TimesheetsSettings")}
             activeOpacity={0.7}
           >
-            <Icon name="person-outline" size={20} color="#333" />
+            <MaterialIcons name="edit-calendar" size={20} color="#333" />
             <Text style={styles.menuText}>Timesheets Settings</Text>
           </TouchableOpacity>
 
-
-
-<TouchableOpacity
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => props.navigation.navigate("OrganizationalSettings")}
             activeOpacity={0.7}
           >
-            <Icon name="person-outline" size={20} color="#333" />
+            <MaterialIcons name="settings-suggest" size={20} color="#333" />
             <Text style={styles.menuText}>Organization Settings</Text>
           </TouchableOpacity>
 
           {/* Help Desk */}
-             <TouchableOpacity
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => props.navigation.navigate("HelpDesk")}
             activeOpacity={0.7}
           >
-            <Icon name="help-circle-outline" size={20} color="#333" />
+            <MaterialIcons name="contact-phone" size={20} color="#333" />
             <Text style={styles.menuText}>Help Desk</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -362,7 +366,7 @@ const CustomDrawerContent = (props) => {
             onPress={() => props.navigation.navigate("HelpDesk")}
             activeOpacity={0.7}
           >
-            <Icon name="help-circle-outline" size={20} color="#333" />
+            <MaterialIcons name="logout" size={20} color="#333" />
             <Text style={styles.menuText}>LogOut</Text>
           </TouchableOpacity>
         </>
@@ -463,23 +467,29 @@ const CustomDrawerContent = (props) => {
 };
 
 const styles = StyleSheet.create({
+ 
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
+    padding: 12,
     borderRadius: 8,
     marginVertical: 5,
     backgroundColor: "#f9f9f9",
+    marginBottom: 5,
   },
   menuText: {
     fontSize: 16,
     marginLeft: 10,
     color: "#333",
+    fontSize: 16,
+    flex: 1,
   },
   subMenu: {
-    paddingLeft: 20,
+    paddingLeft: 10,
     backgroundColor: "#f9f9f9",
     marginTop: 5,
+    
+   
   },
   subMenuItem: {
     flexDirection: "row",
@@ -489,7 +499,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   subMenuText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#666",
     marginLeft: 10,
   },
