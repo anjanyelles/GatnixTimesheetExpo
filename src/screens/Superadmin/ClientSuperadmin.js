@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, FlatList, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { getClientSuperadmindata } from '../aftherlogin';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const EmployeeSuperadmin = () => {
+import { getClientSuperadmindata } from '../aftherlogin';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+
+const ClientSuperadmin = () => {
   const tableHeaders = [
     'T.ID',
     'Client Name',
@@ -15,40 +18,50 @@ const EmployeeSuperadmin = () => {
   ];
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState([]); // Ensure it's an empty array initially
+  const [filteredData, setFilteredData] = useState([]);
   const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchClientSuperadmindata = async () => {
-      try {
-        const response = await getClientSuperadmindata();
-        if (response?.data) {
-          const formattedData = response.data.map((item, index) => ({
-            id: `${index + 1}`,
-            clientName: item.clientName || '',
-            clientEmail: item.clientBillingEmail || '',
-            phone: item.clientPhoneNumber || '',
-            endClient: item.endClientName || '',
-            endClientEmail: item.endClientEmail || '',
-          }));
+  const navigate = useNavigation()
 
-          console.log('Formatted Data:', formattedData);
-          setAllData(formattedData);
-          setFilteredData(formattedData); // Initialize filteredData with allData
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+
+  useFocusEffect(
+    useCallback(() => {
+     
+      fetchClientSuperadmindata();
+    }, [])
+  );
+  
+
+
+  const fetchClientSuperadmindata = async () => {
+    try {
+      const response = await getClientSuperadmindata();
+      if (response?.data) {
+        const formattedData = response.data.map((item, index) => ({
+          number: `${index + 1}`,
+          id: item.id || '',
+          clientName: item.clientName || '',
+          clientEmail: item.clientBillingEmail || '',
+          phone: item.clientPhoneNumber || '',
+          endClient: item.endClientName || '',
+          endClientEmail: item.endClientEmail || '',
+        }));
+
+        console.log('Formatted Data:', formattedData);
+        setAllData(formattedData);
+        setFilteredData(formattedData); 
       }
-    };
-    fetchClientSuperadmindata();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
     if (!text) {
-      setFilteredData(allData); // Reset to all data if search is empty
+      setFilteredData(allData); 
       return;
     }
 
@@ -82,16 +95,62 @@ const EmployeeSuperadmin = () => {
   };
 
   const handleEdit = (id) => {
-    console.log(`Edit item with ID: ${id}`);
+    navigate.navigate('EditClientData', { clientId: id });
+  };
+  
+  const handleDelete = async (id) => {
+    console.log("deleting ID:", id)
+
+    Alert.alert(
+      "Confirm Deletion",
+      `Are you sure you want to delete this employee? (${id})`,
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Deletion canceled"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+
+              const response = await fetch(
+                `https://www.gatnix.com/api/v1/timesheet/172/clients/${id}`,
+                {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                }
+              );
+
+              const data = await response.json();
+
+              if (response) {
+                  console.log("Deletion successful:", data);
+                  alert(JSON.stringify(data.message)); 
+                await fetchClientSuperadmindata();
+              } else {
+                console.error("Deletion failed:", data);
+              }
+            } catch (error) {
+              console.error("Error deleting employee:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
-  const handleDelete = (id) => {
-    console.log(`Delete item with ID: ${id}`);
-  };
+
+
+
 
   const renderRow = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
+      <Text style={styles.cell}>{item.number}</Text>
       <Text style={styles.cell}>{item.clientName}</Text>
       <Text style={styles.cell}>{item.clientEmail}</Text>
       <Text style={styles.cell}>{item.phone}</Text>
@@ -110,7 +169,23 @@ const EmployeeSuperadmin = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Client Details</Text>
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Client Details</Text>
+        <View style={styles.addButtonContainer}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigate.navigate('AddClients')}
+          >
+            <Ionicons name="add-circle-outline" size={20} color="blue" />
+            <Text style={styles.buttonText}> Add Client</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+
+
+
 
       <View style={styles.searchContainer}>
         <TextInput
@@ -242,6 +317,42 @@ const styles = StyleSheet.create({
   disabledButton: {
     color: 'gray',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  title: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  addButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 15,
+  },
+  addButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: '#F39237',
+    borderRadius: 10,
+    width: 'auto',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 5,
+  },
+
+
 });
 
-export default EmployeeSuperadmin;
+export default ClientSuperadmin;

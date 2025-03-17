@@ -39,6 +39,87 @@ const handleApiRequestAfterLoginService = async (
   }
 };
 
+
+export const getClientdataById = async (clientId) => {
+
+  const orgId = await AsyncStorage.getItem("id");
+
+  try{
+
+    return await fetch(
+      `https://www.gatnix.com/api/v1/timesheet/172/clients/${clientId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      
+    ).then(response => response.json());
+
+  }catch(error){
+    console.error("Error fetching employee details:", error);
+    throw error;
+  }
+
+}
+
+
+export const registerEmployee = async (employeeData) => {
+  try {
+    const orgId = await AsyncStorage.getItem("id");
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    console.log("organization Id:",orgId)
+    const requestBody = {
+      ...employeeData,
+      organizationId: 172,
+      username: employeeData.email.split('@')[0],
+      role: "employee",
+      schedulerStatus: true,
+      createdDate: currentDate
+    };
+    console.log("Request Body:", requestBody);
+
+
+    return await handleApiRequestAfterLoginService(
+      'auth/register',
+      'POST',
+      requestBody
+    );
+  } catch (error) {
+    console.error('Registration Error:', error);
+    throw error;
+  }
+};
+
+
+export const registerApprovalManager = async (employeeData) => {
+  try {
+    const orgId = await AsyncStorage.getItem("id");
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    console.log("organization Id:",orgId)
+    const requestBody = {
+      ...employeeData,
+      organizationId: 172,
+      username: employeeData.email.split('@')[0],
+      role: "approvalManagers",
+      schedulerStatus: true,
+      createdDate: currentDate
+    };
+    return await handleApiRequestAfterLoginService(
+      'auth/register',
+      'POST',
+      requestBody
+    );
+  } catch (error) {
+    console.error('Registration Error:', error);
+    throw error;
+  }
+};
+
+
 // ✅ Get Deal Details by ID
 export const handelgetDashboardCardApi = async () => {
   const id = await AsyncStorage.getItem("id");
@@ -62,8 +143,23 @@ export const sendWhatsappOtpapi = async (whatsappData, value) => {
 export const getEmplyeedata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
+  console.log("orgId", orgId);
+  console.log("id", id);
   return await handleApiRequestAfterLoginService(
     `org-user-association/${orgId}/get-users/userId/${id}/role/employee/status/ALL?page=0&size=10`,
+    "POST",
+    {}
+  );
+};
+
+
+export const getEmplyeedataForProjects = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  console.log("orgId", orgId);
+  console.log("id", id);
+  return await handleApiRequestAfterLoginService(
+    `org-user-association/${orgId}/get-users/userId/${id}/role/employee/status/ALL?page=0&size=100`,
     "POST",
     {}
   );
@@ -79,6 +175,17 @@ export const getApprovalManagerdata = async () => {
   );
 };
 
+
+export const getApprovalManagerdataForProjects = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(
+    `${orgId}/users?role=approvalManagers&page=0&size=50`,
+    "GET",
+    {}
+  );
+};
+
 export const getClientSuperadmindata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
@@ -88,6 +195,19 @@ export const getClientSuperadmindata = async () => {
     {}
   );
 };
+
+export const getClientDataForProjects = async () => {
+  const id = await AsyncStorage.getItem("id");
+  const orgId = await AsyncStorage.getItem("orgId");
+  return await handleApiRequestAfterLoginService(
+    `timesheet/${orgId}/clients/search?page=0&size=100`,
+  "POST",
+    {}
+  );
+};
+
+
+
 
 export const getSubmittedsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
@@ -213,7 +333,7 @@ export const getProjectdetailsdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/project/employee/status/all/search?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/project/employee/status/all/search?page=0&size=10&sort=id,desc`,
     "POST",
     {}
   );
@@ -248,3 +368,17 @@ export const updateUserProfileDetails = async (status) => {
     {}
   );
 };
+
+
+export const addProject=async(data)=>{
+  const orgId = await AsyncStorage.getItem("orgId");
+  
+  const employeeData=data.employeeId
+console.log("employee id for creating a project is ",employeeData)
+  return await handleApiRequestAfterLoginService(
+    `timesheet/${orgId}/project/create/${employeeData}`,
+    "POST",
+    data
+  );
+  
+}

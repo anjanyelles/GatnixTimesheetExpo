@@ -34,6 +34,14 @@ import OrganisationSettings from './src/screens/Superadmin/OrganizationalSetting
 import ProjectDetails from './src/screens/ProjectDetails';
 import TimeSheetpagetable from './src/screens/TimeSheetpagetable';
 import Timesheet from './src/screens/Timesheet';
+import AddProject from './src/screens/Approvalmanagers/AddProject';
+import AddEmployee from './src/screens/Approvalmanagers/AddEmployee';
+import EditData from './src/screens/Approvalmanagers/Editdata';
+import AddApprovalManager from './src/screens/Approvalmanagers/AddApprovalManager';
+import AddClients from './src/screens/Superadmin/AddClients';
+import EditClientData from './src/screens/Superadmin/EditClientData';
+import AddProject1 from './src/screens/Approvalmanagers/AddProject1';
+import ViewProject from './src/screens/Approvalmanagers/ViewProject';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -90,8 +98,20 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Employee" component={Employee} />
     {/* Superadmin */}
     <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} />
+    <Drawer.Screen name="AddClients" component={AddClients} />
+    <Drawer.Screen name="EditClientData" component={EditClientData} />
     <Drawer.Screen name="ApprovalManager" component={ApprovalManager} />
     <Drawer.Screen name="EmployeeSuperadmin" component={EmployeeSuperadmin} />
+    <Drawer.Screen name="AddProject" component={AddProject} />
+    <Drawer.Screen name="ViewProject" component={ViewProject} />
+    <Drawer.Screen name="AddEmployee" component={AddEmployee} />
+    <Drawer.Screen name="Editdata" component={EditData} />
+    <Drawer.Screen name="approvalManagers" component={AddApprovalManager} />
+
+
+    <Drawer.Screen name="AddProject1" component={AddProject1} />
+
+
   </Drawer.Navigator>
 );
 
@@ -109,6 +129,9 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="MultipleLogin" component={MultipleLogin} />
+
+        
+
         {/* Main App Drawer */}
         {/* <Stack.Screen name="Main" component={DrawerNavigator} /> */}
       </Stack.Navigator>

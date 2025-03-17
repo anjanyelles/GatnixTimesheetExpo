@@ -1,50 +1,184 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView,Switch,Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getApprovalManagerdata } from '../aftherlogin';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+
 
 const ApprovalManager = () => {
   const [allData, setAllData] = useState([]); 
+  const [fullManagerData, setFullManagerData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState('All Employees');
+  const navigation=useNavigation()
 
-  useEffect(() => {
-    const fetchApprovalManagerData = async () => {
-      try {
-        const response = await getApprovalManagerdata();
-        if (response?.data) {
-          
-          const formattedData = response.data.map((item, index) => ({
-            id: `${index + 1}`, // Ensure ID is a string
-            firstName: item.firstName || '',
-            lastName: item.lastName || '',
-            email: item.email || '',
-            phone: item.mobile || '',
-          }));
-          console.log("formattedData",formattedData)
-          setAllData(formattedData); // ✅ Update allData with API response
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+  const fetchApprovalManagerData = async () => {  
+    try {
+      const response = await getApprovalManagerdata();
+      console.log("ApprovalManagerData:", response.data);
+      
+      if (response?.data) {
+        const formattedData = response.data.map((item, index) => ({
+          number: `${index + 1}`,
+          id: item.id || '',
+          firstName: item.firstName || '',
+          lastName: item.lastName || '',
+          email: item.email || '',
+          phone: item.mobile || '',
+          loginStatus: item.loginStatus || false,
+        }));
+
+        setFullManagerData(response.data);
+        setAllData(formattedData);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    fetchApprovalManagerData();
-  }, []);
+  // useEffect(() => {
+  //   fetchApprovalManagerData(); 
+  // }, []);
+
+  useFocusEffect(
+    useCallback(()=>{
+      fetchApprovalManagerData(); 
+    },[])
+  )
+
+
+   const handleDelete = async (id) => {
+
+    const updatedManager = fullManagerData.find(emp => emp.id === id);
+
+    console.log("ID:", id);
+    console.log("Updated Employee:", updatedManager);
+
+      Alert.alert(
+          "Confirm Deletion", 
+          `Are you sure you want to delete this employee? (${id})`, 
+          [
+              {
+                  text: "Cancel",
+                  onPress: () => console.log("Deletion canceled"),
+                  style: "cancel",
+              },
+              {   
+                  text: "OK",
+                  onPress: async () => {
+                      console.log(`Deleting employee with ID: ${updatedManager.id} and Association ID: ${updatedManager.associationId}`);
+                      
+                      try {
+  
+                          const response = await fetch(
+                              `https://www.gatnix.com/api/v1/timesheet/172/project/approval-manager/delete/${updatedManager.id}/association/${updatedManager.associationId}`,
+                              {
+                                  method: 'DELETE',
+                                  headers: {
+                                      'Content-Type': 'application/json',
+                                  },
+                              }
+                          );
+  
+                          const data = await response.json(); 
+  
+                          if (response) {
+                              console.log("Deletion successful:", data);
+                              fetchApprovalManagerData();                             
+                          } else {
+                              console.error("Deletion failed:", data);
+                          }
+                      } catch (error) {
+                          console.error("Error deleting employee:", error);
+                      }
+                  },
+              },
+          ],
+          { cancelable: false }
+      );
+  };
+
+
 
   const getFilteredData = () => {
-    if (!searchQuery) return allData; // Return all data if search is empty
+    if (!searchQuery) return allData; 
 
     return allData.filter((item) =>
-      [item.firstName, item.lastName, item.email, item.phone, String(item.id)] // Ensure ID is a string
-        .filter(Boolean) // Remove undefined/null values
+      [item.firstName, item.lastName, item.email, item.phone, String(item.id)] 
+        .filter(Boolean) 
         .some((field) => field.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   };
 
   const handleEdit = (id) => console.log(`Edit employee with ID: ${id}`);
   const handleView = (id) => console.log(`View employee with ID: ${id}`);
-  const handleDelete = (id) => console.log(`Delete employee with ID: ${id}`);
+
+  const handleStatusToggle = async (id, currentStatus) => {
+    const updatedEmployee = fullManagerData.find(emp => emp.id === id);
+
+    console.log("ID:", id);
+    console.log("Current Status:", currentStatus);
+    console.log("Updated Employee:", updatedEmployee);
+    if (!updatedEmployee) {
+      console.error(`Employee with ID ${id} not found.`);
+      return;
+    }
+
+  
+    const updatedData = {
+      id: updatedEmployee.associationId,
+      userId: updatedEmployee.id,
+      orgId: updatedEmployee.organizationId,
+      userUUID: updatedEmployee.userUUID,
+      firstName: updatedEmployee.firstName,
+      lastName: updatedEmployee.lastName,
+      email: updatedEmployee.email,
+      associatedRole: updatedEmployee.role,
+      managingEmployerId: updatedEmployee.managingEmployerId,
+      managingAdminId: updatedEmployee.managingAdminId,
+      loginStatus: !currentStatus, // Toggle the status
+      schedulerStatus: updatedEmployee.schedulerStatus,
+      associatedDate: updatedEmployee.createdDate,
+      mobileCountryCode: updatedEmployee.mobileCountryCode,
+      mobileIsoCode: updatedEmployee.mobileIsoCode,
+      mobileNumber: updatedEmployee.mobile,
+      whatsappCountryCode: updatedEmployee.whatsappCountryCode,
+      whatsappIsoCode: updatedEmployee.whatsappIsoCode,
+      whatsAppNumber: updatedEmployee.whatsAppNumber
+    };
+  
+    try {
+      console.log("Updated Data:", updatedData);
+      console.log(`Updating status for ID: ${id} to ${!currentStatus}...`);
+  
+      const response = await fetch(
+        `https://www.gatnix.com/api/v1/org-user-association/update/${updatedData.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData),
+        }
+      );
+  
+      if (!response) {
+        throw new Error(`Failed to update employee status: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+
+     
+       fetchApprovalManagerData();
+  
+    } catch (error) {
+      console.error('Error updating employee status:', error);
+    }
+  };
+  
+
+
+
 
   const renderRow = ({ item, index }) => (
     <View style={styles.row}>
@@ -53,6 +187,21 @@ const ApprovalManager = () => {
       <Text style={styles.cell}>{item.lastName}</Text>
       <Text style={styles.cell}>{item.email}</Text>
       <Text style={styles.cell}>{item.phone}</Text>
+
+
+      <View style={[styles.cell, styles.toggleContainer]}>
+  <Switch
+    value={item.loginStatus}
+    onValueChange={() => handleStatusToggle(item.id, item.loginStatus)}
+    trackColor={{ false: '#767577', true: '#81b0ff' }}
+    thumbColor={item.loginStatus ? '#4CAF50' : '#f4f3f4'}
+  />
+  <Text style={[styles.statusText, { color: item.loginStatus ? '#4CAF50' : '#F44336' }]}>
+    {item.loginStatus ? 'Active' : 'Inactive'}
+  </Text>
+</View>
+
+
       <View style={styles.actionButtons}>
         <TouchableOpacity onPress={() => handleView(item.id)}>
           <Ionicons name="eye" size={20} color="#4CAF50" style={styles.icon} />
@@ -90,10 +239,26 @@ const ApprovalManager = () => {
         ))}
       </View>
 
+      <View style={styles.addButtonContainer}>
+        <TouchableOpacity 
+          style={styles.addButton} 
+          onPress={() => 
+          {
+            navigation.navigate('approvalManagers')
+            
+          }
+          }
+        >
+          <Ionicons name="add-circle-outline" size={20} color="#fff" />
+          <Text style={styles.buttonText}>  Add </Text> 
+        </TouchableOpacity>
+      </View>
+
+
       <ScrollView horizontal>
         <View>
           <View style={[styles.row, styles.header]}>
-            {['S.No', 'First Name', 'Last Name', 'Email', 'Phone No', 'Actions'].map((header, index) => (
+            {['S.No', 'First Name', 'Last Name', 'Email', 'Phone No', 'Login Status','Actions'].map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
                 {header}
               </Text>
@@ -142,6 +307,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 20,
   },
+  toggleContainer: {
+    justifyContent: 'center',  
+    alignItems: 'center',      
+    flexDirection: 'column',    
+    flex: 1,                  
+  },
+  
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -200,6 +372,35 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
+  addButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 15,
+  },
+  addButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: '#F39237',
+    borderRadius: 10,
+    width: 'auto',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    
+  }, 
+  buttonText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  statusText: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 2,
+  },
 });
 
 export default ApprovalManager;
+
+
+
