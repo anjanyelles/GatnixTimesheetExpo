@@ -143,9 +143,11 @@ const navigation = useNavigation();
     );
   };
 
-  const handleEdit = (id) => {
-    console.log(`Edit employee with ID: ${id}`);
-  };
+ 
+
+  const editEmployeeDetails=(employeeId)=>{
+      navigation.navigate('EditEmployeeDetails',{id:employeeId,page:"Employee",role:"Employee"})
+   }
 
   const handleView = (id) => {
     console.log(`View employee with ID: ${id}`);
@@ -228,7 +230,7 @@ const navigation = useNavigation();
         <TouchableOpacity onPress={() => handleView(item.id)}>
           <Ionicons name="eye" size={20} color="#4CAF50" style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleEdit(item.id)}>
+        <TouchableOpacity onPress={() => editEmployeeDetails(item.id)}>
           <Ionicons name="create" size={20} color="#FFC107" style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDelete(item.id,item.firstName ,item.associationId)}>

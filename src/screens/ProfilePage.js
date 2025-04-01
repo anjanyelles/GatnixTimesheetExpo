@@ -6,18 +6,111 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator, Modal,
-  StyleSheet
+  StyleSheet, ToastAndroid, Alert,
+  Linking
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons"; // Importing Ionicons
-import styles from "./styles"; // Importing styles from the styles.js file
+import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/Ionicons";
+
+import styles from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { getUserProfiledata } from "./aftherlogin";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import EditEducationScreen from "../components/EditEducationScreen";
+import { use } from "react";
 
 const ProfilePage = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [orgId, setOrgId] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  const [socialLinks, setSocialLinks] = useState({
+    id:'',
+    userId:'',
+    userOrgAssociationId:'',
+    facebook: '',
+    twitter: '',
+    github: '',
+    instagram:'',
+    linkedIn:'' ,
+  });
+
+  const fetchData = async () => {
+    try {
+      const storedOrgId = await AsyncStorage.getItem("orgId");
+      const storedUserId = await AsyncStorage.getItem("id");
+
+      if (storedOrgId) setOrgId(storedOrgId);
+      if (storedUserId) setUserId(storedUserId);
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+
+
+
+
+  const handleRemove = async (type, id) => {
+    Alert.alert(
+      "Confirm Deletion",
+      `Are you sure you want to delete this ${type} record?`,
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Deletion cancelled"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            console.log("Removing item:", type, id);
+
+            try {
+              let endpoint = "";
+              switch (type) {
+                case "education":
+                  endpoint = `https://www.gatnix.com/api/v1/org/${orgId}/user/${userId}/user-profile/educationDetails/${id}`;
+                  break;
+                case "workDetails":
+                  endpoint = `https://www.gatnix.com/api/v1/org/${orgId}/user/${userId}/user-profile/workDetails/${id}`;
+                  break;
+                case "skills":
+                  endpoint = `https://www.gatnix.com/api/v1/org/${orgId}/user/${userId}/user-profile/skills/${id}`;
+                  break;
+                default:
+                  return;
+              }
+
+              const response = await fetch(endpoint, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (response.ok) {
+                alert(`${type} removed successfully!`);
+                setUserData((prevData) => ({
+                  ...prevData,
+                  [type]: prevData[type].filter((item) => item.id !== id),
+                }));
+              } else {
+                alert("Failed to remove item.");
+              }
+            } catch (error) {
+              console.error("Error removing item:", error);
+              alert("An error occurred while removing the item.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleDelete = () => {
     console.log("Deleted Successfully!");
     setModalVisible(false);
@@ -27,21 +120,47 @@ const ProfilePage = ({ navigation }) => {
     setModalVisible(false);
     console.log("Updated Education Data:", updatedData);
   };
-  useEffect(() => {
-    const handelgetUserProfileData = async () => {
-      try {
-        const response = await getUserProfiledata();
-        console.log("Response", response);
-        setUserData(response);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      const handelgetUserProfileData = async () => {
+        try {
+          const response = await getUserProfiledata();
+          console.log("user data Response", response);
+          console.log("user education id", response.education[0]?.id);
+          console.log("user job id", response.workDetails[0]?.id);
+          console.log("user skill id", response.skills[0]?.id);
+          setUserData(response);
+          setSocialLinks({
+            id: response.socialLinks.id,
+            userId: response.socialLinks.userId,
+            userOrgAssociationId: response.socialLinks.userOrgAssociationId,
+            facebook: response.socialLinks.facebook!=null ? response.socialLinks.facebook : "https://timesheet.gatnix.com/timesheet",
+            twitter: response.socialLinks.twitter!=null ? response.socialLinks.twitter : "https://timesheet.gatnix.com/timesheet",  
+            instagram: response.socialLinks.instagram!=null ? response.socialLinks.instagram : "https://timesheet.gatnix.com/timesheet",
+            twitter: response.socialLinks.twitter!=null ? response.socialLinks.twitter : "https://timesheet.gatnix.com/timesheet",
+            github: response.socialLinks.github!=null ? response.socialLinks.github : "https://timesheet.gatnix.com/timesheet",
+            linkedIn: response.socialLinks.linkedIn!=null ? response.socialLinks.linkedIn : "https://timesheet.gatnix.com/timesheet",
+          })
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    handelgetUserProfileData();
-  }, []);
+      handelgetUserProfileData();
+    }, [])
+  );
+
+  const openURL = (url) => {
+    const finalURL =  url.trim() !== "" ? url : "https://timesheet.gatnix.com/timesheet";
+  
+    Linking.openURL(finalURL).catch((err) => 
+      Alert.alert("Error", "Failed to open URL")
+    );
+  };
+
 
   if (loading) {
     return (
@@ -62,36 +181,33 @@ const ProfilePage = ({ navigation }) => {
           }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{`${
-          userData?.user?.firstName || "N/A"
-        } ${userData?.user?.lastName || ""}`}</Text>
+        <Text style={styles.profileName}>{`${userData?.user?.firstName || "N/A"
+          } ${userData?.user?.lastName || ""}`}</Text>
       </View>
       <TouchableOpacity
         style={styles.editButton1}
-        onPress={() => navigation.navigate("EditProfile")}
+        onPress={() => navigation.navigate("EditProfile", { userId: userId ,usage:"profile" })}
       >
         <Text style={styles.editText1}>EDIT</Text>
-        <Icon name="add-circle-outline" size={18} color="#000" />
+        <Icon name="pencil" size={18} color="#000" />
       </TouchableOpacity>
+
       <View style={styles.infoContainer}>
         <InfoRow
           label="Name"
-          value={`${userData?.user?.firstName || "N/A"} ${
-            userData?.user?.lastName || ""
-          }`}
+          value={`${userData?.user?.firstName || "N/A"} ${userData?.user?.lastName || ""
+            }`}
         />
         <InfoRow label="E-Mail" value={userData?.user?.email || "N/A"} />
         <InfoRow
           label="Phone"
-          value={`${userData?.user?.mobileCountryCode || ""} ${
-            userData?.user?.mobile || "N/A"
-          }`}
+          value={`${userData?.user?.mobileCountryCode || ""} ${userData?.user?.mobile || "N/A"
+            }`}
         />
         <InfoRow
           label="Experience"
-          value={`${
-            userData?.basicUserProfile?.totalExperience || "N/A"
-          } years`}
+          value={`${userData?.basicUserProfile?.totalExperience || "N/A"
+            } years`}
         />
         <InfoRow
           label="Job Role"
@@ -107,7 +223,7 @@ const ProfilePage = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Education Details</Text>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate("AddEducationalDetails")}
+            onPress={() => navigation.navigate("EducationDetails", { mode: "add" })}
           >
             <Text style={styles.buttonText}>ADD</Text>
             <Icon name="add-circle-outline" size={18} color="#000" />
@@ -167,7 +283,9 @@ const ProfilePage = ({ navigation }) => {
                 >
                   <TouchableOpacity
                     style={styles.actionButton}
-                    // onPress={() => setModalVisible(true)}
+                    onPress={() => navigation.navigate("EducationDetails", { mode: "edit_edu", edu })}
+
+                  // onPress={() => setModalVisible(true)}
                   >
                     <Icon name="create-outline" size={24} color="#f66e22" />
                   </TouchableOpacity>
@@ -180,7 +298,7 @@ const ProfilePage = ({ navigation }) => {
                   /> */}
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => setModalVisible(true)}
+                    onPress={() => handleRemove("education", edu.id)}
                   >
                     <Icon name="trash-outline" size={24} color="#FF3B30" />
                   </TouchableOpacity>
@@ -204,7 +322,7 @@ const ProfilePage = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Work Experience</Text>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate("AddJobDetails")}
+            onPress={() => navigation.navigate("workDetails", { mode: "add" })}
           >
             <Text style={styles.buttonText}>ADD</Text>
             <Icon name="add-circle-outline" size={18} color="#000" />
@@ -261,14 +379,14 @@ const ProfilePage = ({ navigation }) => {
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() =>
-                      navigation.navigate("EditEducation", { edu })
+                      navigation.navigate("workDetails", { mode: "edit_job", edu })
                     }
                   >
                     <Icon name="create-outline" size={24} color="#f66e22" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => setModalVisible(true)}
+                    onPress={() => handleRemove("workDetails", edu.id)}
                   >
                     <Icon name="trash-outline" size={24} color="#FF3B30" />
                   </TouchableOpacity>
@@ -292,7 +410,7 @@ const ProfilePage = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Skill Set</Text>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate("AddSkillsDetails")}
+            onPress={() => navigation.navigate("skillDetails", { mode: "add" })}
           >
             <Text style={styles.buttonText}>ADD</Text>
             <Icon name="add-circle-outline" size={18} color="#000" />
@@ -347,14 +465,14 @@ const ProfilePage = ({ navigation }) => {
                 >
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => navigation.navigate("EditSkill", { skill })} // Pass skill data
+                    onPress={() => navigation.navigate("skillDetails", { mode: "edit_skill", skill })}
                   >
                     <Icon name="create-outline" size={24} color="#f66e22" />
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => setModalVisible(true)}
+                    onPress={() => handleRemove("skills", skill.id)}
                   >
                     <Icon name="trash-outline" size={24} color="#FF3B30" />
                   </TouchableOpacity>
@@ -369,6 +487,39 @@ const ProfilePage = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
+
+      <View style={styles.sectionContainer}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => openURL()} style={styles.icon}>
+          <FontAwesomeIcon name="facebook" size={30} color="#3b5998" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => openURL("")} style={styles.icon}>
+          <FontAwesomeIcon name="twitter" size={30} color="#1DA1F2" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => openURL("")} style={styles.icon}>
+          <FontAwesomeIcon name="github" size={30} color="#000000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => openURL("")} style={styles.icon}>
+          <FontAwesomeIcon name="instagram" size={30} color="#E4405F" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => openURL("")} style={styles.icon}>
+          <FontAwesomeIcon name="linkedin" size={30} color="#0077B5" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate("EditProfile", { userId: userId ,usage:"socialmedia" })}
+        >
+          <Text style={styles.editText}>EDIT</Text>
+          <Icon name="pencil" size={18} color="#000" />
+        </TouchableOpacity>
+      </View>
+    </View>
+
     </ScrollView>
   );
 };

@@ -23,14 +23,13 @@ const Project = () => {
       }, [])
     );
 
-
   const fetchProjectData = async () => {
     const orgId=await AsyncStorage.getItem("orgId")
     console.log(orgId)
     setLoading(true)
     try {
       const response = await getProjectdetailsdata();
-     // console.log("Response Data:", response.data); // Log full response
+      console.log("Response Data:", response.data); // Log full response
 
       if (response?.data) {
         const formattedData = response.data.map((item, index) => {
@@ -57,6 +56,7 @@ const Project = () => {
             
 
         setAllData(formattedData);
+        setFullProjectData(response.data)
     }
     } catch (error) {
       console.error("Error fetching the project data:", error);
@@ -138,12 +138,11 @@ const Project = () => {
   const handleDelete=(id)=>{
     console.log(id);
     const projectDetails=fullprojectData.find(data=>data.id==id)
-    console.log(projectDetails.employeeId)
-
-
+    console.log("deleting project id is :",projectDetails)
      Alert.alert(
             "Confirm Deletion", 
-            `Are you sure you want to delete this project? ${id} (${projectDetails.employeeId})`, 
+            `Are you sure you want to delete this
+             project? ${id} (${projectDetails.employeeId})`, 
             [
                 {
                     text: "Cancel",
@@ -153,12 +152,17 @@ const Project = () => {
                 {   
                     text: "OK",
                     onPress: async () => {
-                        
+
+                      const orgId = await AsyncStorage.getItem("orgId");
+                      if(!orgId){
+                        Alert.alert('Error', 'Organization ID not found!');
+                        return;
+                      }
                         
                         try {
     
                             const response = await fetch(
-                                `https://www.gatnix.com/api/v1/timesheet/172/project/${projectDetails.employeeId}/${id}`,
+                                `https://www.gatnix.com/api/v1/timesheet/${orgId}/project/${projectDetails.employeeId}/${id}`,
                                 {
                                     method: 'DELETE',
                                     headers: {
@@ -170,11 +174,12 @@ const Project = () => {
                            
     
                             if (response.status==204) {
-                                console.log("Deletion successful:", data);
+                                console.log("Deletion successful:", response);
                                 await  fetchProjectData()
                             } else {
                                 console.error("Deletion failed:", data);
                             }
+                            
                         } catch (error) {
                             console.error("Error deleting employee:", error);
                         }

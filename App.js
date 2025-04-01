@@ -40,8 +40,12 @@ import EditData from './src/screens/Approvalmanagers/Editdata';
 import AddApprovalManager from './src/screens/Approvalmanagers/AddApprovalManager';
 import AddClients from './src/screens/Superadmin/AddClients';
 import EditClientData from './src/screens/Superadmin/EditClientData';
-import AddProject1 from './src/screens/Approvalmanagers/AddProject1';
 import ViewProject from './src/screens/Approvalmanagers/ViewProject';
+import EditEmployeeDetails from './src/screens/Approvalmanagers/EditEmployeeDetails';
+import EditProjectDetails from './src/screens/Approvalmanagers/EditProjectDetails';
+import AddUserEducationDetails from './src/screens/Superadmin/AddUserEducationDetails';
+import AddUserJobDetails from './src/screens/Superadmin/AddUserJobDetails';
+import AddUserSkillsDetails from './src/screens/Superadmin/AddUserSkillsDetails';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -96,20 +100,44 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Client" component={Client} />
     {/* <Drawer.Screen name="Project" component={Project} /> */}
     <Drawer.Screen name="Employee" component={Employee} />
+    <Drawer.Screen name="EditEmployeeDetails" component={EditEmployeeDetails} />
     {/* Superadmin */}
     <Drawer.Screen name="ClientSuperadmin" component={ClientSuperadmin} />
     <Drawer.Screen name="AddClients" component={AddClients} />
     <Drawer.Screen name="EditClientData" component={EditClientData} />
     <Drawer.Screen name="ApprovalManager" component={ApprovalManager} />
     <Drawer.Screen name="EmployeeSuperadmin" component={EmployeeSuperadmin} />
+
     <Drawer.Screen name="AddProject" component={AddProject} />
+    
+    <Drawer.Screen name="EditProjectDetails" component={EditProjectDetails} />
+
     <Drawer.Screen name="ViewProject" component={ViewProject} />
     <Drawer.Screen name="AddEmployee" component={AddEmployee} />
     <Drawer.Screen name="Editdata" component={EditData} />
     <Drawer.Screen name="approvalManagers" component={AddApprovalManager} />
 
+    <Drawer.Screen name="workDetails" component={AddUserJobDetails} options={({route})=>({
+      title: route.params?.mode === "edit_job" 
+      ? "Edit Work Details" 
+      : "Add Work Details",
+    })} />
+    <Drawer.Screen
+  name="EducationDetails"
+  component={AddUserEducationDetails}
+  options={({ route }) => ({
+    title: route.params?.mode === "edit_edu" 
+      ? "Edit Education Details" 
+      : "Add Education Details",
+  })}
+/>
+ <Drawer.Screen name="skillDetails" component={AddUserSkillsDetails} options={({ route }) => ({
+    title: route.params?.mode === "edit_skill" 
+      ? "Edit Skill Details" 
+      : "Add Skill Details",
+   })}
+   />
 
-    <Drawer.Screen name="AddProject1" component={AddProject1} />
 
 
   </Drawer.Navigator>
@@ -122,7 +150,8 @@ const App = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {/* Authentication Screens */}
 
-        <Stack.Screen name="Main" component={DrawerNavigator} />
+<Stack.Screen name="Main" component={DrawerNavigator} />
+       
         <Stack.Screen name="SignInScreen" component={SignInScreen} />
 
         <Stack.Screen name="Otp" component={Otp} />

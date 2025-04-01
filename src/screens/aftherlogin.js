@@ -64,6 +64,100 @@ export const getClientdataById = async (clientId) => {
 
 }
 
+export const getEmployeedataById = async (employeeId) => {
+
+  const orgId = await AsyncStorage.getItem("id");
+
+  try{
+    return await fetch(
+      `https://www.gatnix.com/api/v1/org-user-association/172/userId/${employeeId}/associatedRole/employee`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      
+    ).then(response => response.json());
+
+  }catch(error){
+    console.error("Error fetching employee details:", error);
+    throw error;
+  }
+
+}
+
+export const getApprovalManagersdataById = async (ManagerId) => {
+
+  const orgId = await AsyncStorage.getItem("id");
+
+  try{
+    return await fetch(
+      `https://www.gatnix.com/api/v1/org-user-association/172/userId/${ManagerId}/associatedRole/approvalManagers`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      
+    ).then(response => response.json());
+
+  }catch(error){
+    console.error("Error fetching employee details:", error);
+    throw error;
+  }
+
+}
+
+export const updateEmployeedandApprovalManagerDataById = async (data) => {
+
+  const orgId = await AsyncStorage.getItem("id");
+
+  try{
+    return await fetch(
+      `https://www.gatnix.com/api/v1/org-user-association/update/${data.userId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      },
+    ).then(response => response.json());
+
+  }catch(error){
+    console.error("Error fetching employee details:", error);
+    throw error;
+  }
+
+}
+
+export const getProjectDetailsById=async(projectId)=>{
+
+  const orgId = await AsyncStorage.getItem("id");
+
+  try{ 
+    return await fetch(
+      `https://www.gatnix.com/api/v1/timesheet/172/project/id/${projectId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+      
+    ).then(response => response.json());
+
+  }catch(error){
+    console.error("Error fetching employee details:", error);
+    throw error;
+  }
+
+}
+
+
+
 
 export const registerEmployee = async (employeeData) => {
   try {

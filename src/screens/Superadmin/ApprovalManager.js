@@ -110,7 +110,14 @@ const ApprovalManager = () => {
     );
   };
 
-  const handleEdit = (id) => console.log(`Edit employee with ID: ${id}`);
+  const handleEdit = (id) => {
+
+    console.log(`Edit employee with ID: ${id}`)
+    navigation.navigate('EditEmployeeDetails',{id:id,page:"ApprovalManager",role:"ApprovalManager"})
+
+  }
+
+
   const handleView = (id) => console.log(`View employee with ID: ${id}`);
 
   const handleStatusToggle = async (id, currentStatus) => {

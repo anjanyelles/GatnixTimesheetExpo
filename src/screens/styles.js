@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
   profileHeader: {
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 20,
   },
   profileImage: {
     width: 100,
