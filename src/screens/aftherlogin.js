@@ -54,7 +54,7 @@ export const getClientdataById = async (clientId) => {
           'Content-Type': 'application/json',
         },
       }
-      
+
     ).then(response => response.json());
 
   }catch(error){
@@ -77,7 +77,7 @@ export const getEmployeedataById = async (employeeId) => {
           'Content-Type': 'application/json',
         },
       }
-      
+
     ).then(response => response.json());
 
   }catch(error){
@@ -100,7 +100,7 @@ export const getApprovalManagersdataById = async (ManagerId) => {
           'Content-Type': 'application/json',
         },
       }
-      
+
     ).then(response => response.json());
 
   }catch(error){
@@ -137,7 +137,7 @@ export const getProjectDetailsById=async(projectId)=>{
 
   const orgId = await AsyncStorage.getItem("id");
 
-  try{ 
+  try{
     return await fetch(
       `https://www.gatnix.com/api/v1/timesheet/172/project/id/${projectId}`,
       {
@@ -146,7 +146,7 @@ export const getProjectDetailsById=async(projectId)=>{
           'Content-Type': 'application/json',
         },
       }
-      
+
     ).then(response => response.json());
 
   }catch(error){
@@ -307,7 +307,7 @@ export const getSubmittedsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/607/status/submitted/association/super-admin?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${id}/status/submitted/association/super-admin?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );
@@ -466,7 +466,7 @@ export const updateUserProfileDetails = async (status) => {
 
 export const addProject=async(data)=>{
   const orgId = await AsyncStorage.getItem("orgId");
-  
+
   const employeeData=data.employeeId
 console.log("employee id for creating a project is ",employeeData)
   return await handleApiRequestAfterLoginService(
@@ -474,5 +474,5 @@ console.log("employee id for creating a project is ",employeeData)
     "POST",
     data
   );
-  
+
 }

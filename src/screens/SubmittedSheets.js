@@ -27,10 +27,8 @@ const SubmittedSheets = () => {
     const fetchSubmissionSheetdata = async () => {
       try {
         const response = await getSubmittedsheetdata();
-        console.log(response.data[0].startDate); // Debugging output
-
         if (response?.data) {
-          const formattedData = response.data.map((item, index) => ({
+          const formattedData = response.data.map((item) => ({
             sheetId: item.sheetId || "",
             employeeName: item.employeeName || "",
             period: `${new Date(
@@ -44,18 +42,15 @@ const SubmittedSheets = () => {
             status: item.status || "",
             comments: item.comments.length > 0 ? item.comments[0].comment : "",
           }));
-
           setAllData(formattedData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchSubmissionSheetdata();
   }, []);
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [displayedData, setDisplayedData] = useState([]);
@@ -90,7 +85,7 @@ const SubmittedSheets = () => {
       <Text style={styles.cell}>{item.totalHours}</Text>
       <Text style={styles.cell}>{item.client}</Text>
       <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
+      <Text style={[styles.cell, styles.status]}>{item.status}</Text>
       <Text style={styles.cell}>{item.comments}</Text>
     </View>
   );
@@ -98,10 +93,8 @@ const SubmittedSheets = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Submitted Time Sheets</Text>
-
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={[styles.row, styles.header]}>
             {tableHeaders.map((header, index) => (
               <Text key={index} style={[styles.cell, styles.headerText]}>
@@ -109,8 +102,6 @@ const SubmittedSheets = () => {
               </Text>
             ))}
           </View>
-
-          {/* Table Data */}
           <FlatList
             data={displayedData}
             renderItem={renderRow}
@@ -118,10 +109,9 @@ const SubmittedSheets = () => {
           />
         </View>
       </ScrollView>
-
-      {/* Pagination Controls */}
       <View style={styles.paginationWrapper}>
         <Button title="Prev" onPress={prevPage} disabled={currentPage === 1} />
+        <Text style={styles.pageIndicator}>Page {currentPage}</Text>
         <Button
           title="Next"
           onPress={nextPage}
@@ -132,63 +122,66 @@ const SubmittedSheets = () => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#f8f9fa",
+    paddingVertical: 15,
+    backgroundColor: "#F0F4F8",
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
-    textAlign: "start",
-    marginBottom: 20,
-    color: "#333",
+    textAlign: "center",
+    marginBottom: 15,
+    color: "#374151",
   },
   header: {
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#4F46E5",
     borderRadius: 5,
     marginBottom: 5,
     flexDirection: "row",
+    padding: 10,
   },
   headerText: {
-    color: "rgb(74, 73, 73)",
+    color: "#FFF",
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 14,
     width: 120,
-    padding: 4,
-    fontFamily: Platform.select({
-      ios: "San Francisco",
-      android: "Roboto",
-      default: "System",
-    }),
+    padding: 6,
   },
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    paddingVertical: 10,
+    borderBottomColor: "#E5E7EB",
+    paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 5,
+    marginBottom: 4,
   },
   cell: {
     flex: 1,
     fontSize: 14,
     textAlign: "center",
-    color: "#333",
+    color: "#374151",
     paddingHorizontal: 5,
-    fontFamily: Platform.select({
-      ios: "San Francisco",
-      android: "Roboto",
-      default: "System",
-    }),
     width: 120,
+  },
+  status: {
+    fontWeight: "bold",
+    color: "#16A34A",
   },
   paginationWrapper: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 10,
-    marginTop: 10,
+    alignItems: "center",
+    marginTop: 15,
+  },
+  pageIndicator: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginHorizontal: 10,
+    color: "#374151",
   },
 });
 

@@ -36,12 +36,15 @@ const EditProfile = ({ route }) => {
     id: '',
     userId: '',
     userOrgAssociationId: '',
-    facebook: '',
-    twitter: '',
-    github: '',
-    instagram: '',
-    linkedIn: '',
+    facebook: null,
+    twitter: null,
+    git: null,
+    instagram: null,
+    linkedIn: null,
+    organizationId:''
   });
+
+
 
   const [userdetails, setUserDetails] = useState({});
   const [basicuserprofile, setBasicUserProfile] = useState({});
@@ -59,11 +62,11 @@ const EditProfile = ({ route }) => {
     setLoading(true);
     try {
       const response = await getUserProfiledata();
-      console.log("User Profile Data:", response);
-
+      //console.log("User Profile Data:", response);
+      setUserDetails(response.user);
 
       if (usage === "profile") {
-        setUserDetails(response.user);
+
         setBasicUserProfile(response.basicUserProfile);
 
 
@@ -86,12 +89,13 @@ const EditProfile = ({ route }) => {
           id: response.socialLinks.id,
           userId: response.socialLinks.userId,
           userOrgAssociationId: response.socialLinks.userOrgAssociationId,
-          facebook: response.socialLinks.facebook != null ? response.socialLinks.facebook : "",
-          twitter: response.socialLinks.twitter != null ? response.socialLinks.twitter : "",
-          instagram: response.socialLinks.instagram != null ? response.socialLinks.instagram : "",
-          twitter: response.socialLinks.twitter != null ? response.socialLinks.twitter : "",
-          github: response.socialLinks.github != null ? response.socialLinks.github : "",
-          linkedIn: response.socialLinks.linkedIn != null ? response.socialLinks.linkedIn : "",
+          facebook: response.socialLinks.facebook != null ? response.socialLinks.facebook : null,
+          twitter: response.socialLinks.twitter != null ? response.socialLinks.twitter : null,
+          instagram: response.socialLinks.instagram != null ? response.socialLinks.instagram : null,
+          twitter: response.socialLinks.twitter != null ? response.socialLinks.twitter : null,
+          git: response.socialLinks.git != null ? response.socialLinks.git : null,
+          linkedIn: response.socialLinks.linkedIn != null ? response.socialLinks.linkedIn : null,
+          organizationId: String(response.organizationId),
         })
       }
 
@@ -119,7 +123,7 @@ const EditProfile = ({ route }) => {
     }
   };
 
-  const handleSave = async () => {
+  const handleProfileSave = async () => {
     if (!firstName.trim()) {
       Alert.alert("Validation Error", "First Name is required.");
       return;
@@ -221,6 +225,51 @@ const EditProfile = ({ route }) => {
     }
   };
 
+
+  const handleSocialMediaSave = async () => {
+
+    try {
+      setLoading(true);
+
+      const updatedSocialLinks = {
+        ...socialLinks,
+        userId: userId,
+        userOrgAssociationId: socialLinks.userOrgAssociationId,
+
+      };
+      console.log("Updated Social Links:", updatedSocialLinks);
+
+      console.log(`https://www.gatnix.com/api/v1/org/${userdetails.organizationId}/user/${userId}/user-profile/socialLinks/${socialLinks.id}`)
+      const response = await fetch(
+        `https://www.gatnix.com/api/v1/org/${userdetails.organizationId}/user/${userId}/user-profile/socialLinks/${socialLinks.id}`,
+
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedSocialLinks),
+        }
+      );
+
+      console.log("Social Links Update Response:", response);
+
+      if (response) {
+        Alert.alert("Success", "Social media links updated successfully!");
+        navigation.navigate("ProfilePage");
+      } else {
+        Alert.alert("Error", "Failed to update social media links. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating social media links:", error);
+      Alert.alert("Error", "Failed to update social media links. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+
   if (loading) {
     return (
       loading && <ActivityIndicator size="large" color="#007bff" style={styles.loader} />
@@ -314,7 +363,7 @@ const EditProfile = ({ route }) => {
             <TouchableOpacity
               style={styles.saveButton}
               activeOpacity={0.8}
-              onPress={handleSave}
+              onPress={handleProfileSave}
             >
               <Text style={styles.saveButtonText}>Save Changes</Text>
             </TouchableOpacity>
@@ -367,9 +416,9 @@ const EditProfile = ({ route }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="Enter Github URL"
-                  value={socialLinks.github}
+                  value={socialLinks.git}
                   onChangeText={(text) => {
-                    setSocialLinks(prev => ({ ...prev, github: text }));
+                    setSocialLinks(prev => ({ ...prev, git: text }));
                   }}
                 />
               </View>
@@ -401,13 +450,11 @@ const EditProfile = ({ route }) => {
                   }}
                 />
               </View>
-
-
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.saveButton}
                   activeOpacity={0.8}
-                  onPress={handleSave}
+                  onPress={handleSocialMediaSave}
                 >
                   <Text style={styles.saveButtonText}>Save Changes</Text>
                 </TouchableOpacity>
@@ -420,10 +467,8 @@ const EditProfile = ({ route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-
           )
       }
-
     </>
   );
 };
