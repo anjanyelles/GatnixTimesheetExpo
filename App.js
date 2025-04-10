@@ -46,6 +46,7 @@ import EditProjectDetails from './src/screens/Approvalmanagers/EditProjectDetail
 import AddUserEducationDetails from './src/screens/Superadmin/AddUserEducationDetails';
 import AddUserJobDetails from './src/screens/Superadmin/AddUserJobDetails';
 import AddUserSkillsDetails from './src/screens/Superadmin/AddUserSkillsDetails';
+import SubmitedSheetsDetails from './src/screens/SubmitedSheetsDetails';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -76,6 +77,10 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="TimesheetsSettings" component={TimesheetsSettings} />
 
     <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
+    <Drawer.Screen name="SubmitedSheetsDetails" component={SubmitedSheetsDetails} />
+
+
+
     <Drawer.Screen name="ApprovedSheets" component={ApprovedSheets} />
 
     <Drawer.Screen
@@ -94,8 +99,8 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="EditProfile" component={EditProfile} />
     <Drawer.Screen name="AddEducationDetails" component={AddEducationDetails} />
     <Drawer.Screen name="UpdateEducationDetails" component={UpdateEducationDetails} />
-    <Drawer.Screen name="AddJobDetails" component={AddJobDetails} /> 
-    <Drawer.Screen name="AddSkillsDetails" component={AddSkillsDetails} />  
+    <Drawer.Screen name="AddJobDetails" component={AddJobDetails} />
+    <Drawer.Screen name="AddSkillsDetails" component={AddSkillsDetails} />
     {/* Approval Managers */}
     <Drawer.Screen name="Client" component={Client} />
     {/* <Drawer.Screen name="Project" component={Project} /> */}
@@ -109,7 +114,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="EmployeeSuperadmin" component={EmployeeSuperadmin} />
 
     <Drawer.Screen name="AddProject" component={AddProject} />
-    
+
     <Drawer.Screen name="EditProjectDetails" component={EditProjectDetails} />
 
     <Drawer.Screen name="ViewProject" component={ViewProject} />
@@ -118,22 +123,22 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="approvalManagers" component={AddApprovalManager} />
 
     <Drawer.Screen name="workDetails" component={AddUserJobDetails} options={({route})=>({
-      title: route.params?.mode === "edit_job" 
-      ? "Edit Work Details" 
+      title: route.params?.mode === "edit_job"
+      ? "Edit Work Details"
       : "Add Work Details",
     })} />
     <Drawer.Screen
   name="EducationDetails"
   component={AddUserEducationDetails}
   options={({ route }) => ({
-    title: route.params?.mode === "edit_edu" 
-      ? "Edit Education Details" 
+    title: route.params?.mode === "edit_edu"
+      ? "Edit Education Details"
       : "Add Education Details",
   })}
 />
  <Drawer.Screen name="skillDetails" component={AddUserSkillsDetails} options={({ route }) => ({
-    title: route.params?.mode === "edit_skill" 
-      ? "Edit Skill Details" 
+    title: route.params?.mode === "edit_skill"
+      ? "Edit Skill Details"
       : "Add Skill Details",
    })}
    />
@@ -151,7 +156,7 @@ const App = () => {
         {/* Authentication Screens */}
 
 <Stack.Screen name="Main" component={DrawerNavigator} />
-       
+
         <Stack.Screen name="SignInScreen" component={SignInScreen} />
 
         <Stack.Screen name="Otp" component={Otp} />
@@ -159,7 +164,7 @@ const App = () => {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="MultipleLogin" component={MultipleLogin} />
 
-        
+
 
         {/* Main App Drawer */}
         {/* <Stack.Screen name="Main" component={DrawerNavigator} /> */}
