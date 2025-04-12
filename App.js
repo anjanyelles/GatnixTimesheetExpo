@@ -155,7 +155,7 @@ const App = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {/* Authentication Screens */}
 
-<Stack.Screen name="Main" component={DrawerNavigator} />
+
 
         <Stack.Screen name="SignInScreen" component={SignInScreen} />
 
@@ -165,6 +165,7 @@ const App = () => {
         <Stack.Screen name="MultipleLogin" component={MultipleLogin} />
 
 
+        <Stack.Screen name="Main" component={DrawerNavigator} />
 
         {/* Main App Drawer */}
         {/* <Stack.Screen name="Main" component={DrawerNavigator} /> */}

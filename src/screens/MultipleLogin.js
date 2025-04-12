@@ -13,23 +13,24 @@ const MultipleLogin = ({ data }) => {
       // Retrieve email and orgId from AsyncStorage
       const storedEmail = await AsyncStorage.getItem("email");
       const orgId = await AsyncStorage.getItem("id"); // Ensure this key is correct
-  
+
       if (!storedEmail) {
         alert("Email not found in AsyncStorage.");
         return;
       }
-  
-      if (!orgId) {
+
+      if (!orgId) { 
         alert("Organization ID not found in AsyncStorage.");
         return;
       }
-  
+
       // ✅ Correct API URL (Replace {orgId} with actual value)
       const apiUrl = `https://www.gatnix.com/api/v1/${orgId}/reset-password/request-password-reset`;
-  
+
       // API Request Body
-      const requestBody = { email: storedEmail };
-  
+      const requestBody = { email: storedEmail ,emailType:"login",location:"Unknown Location",applicationName:"Timesheet"};
+      console.log("request body is :",requestBody)
+
       // Make POST Request
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -38,13 +39,15 @@ const MultipleLogin = ({ data }) => {
         },
         body: JSON.stringify(requestBody),
       });
-  
+
+
+
       // ✅ Read response as text
       const rawResponse = await response.text();
-  
+
       // ✅ Log response
       console.log("Raw API Response:", rawResponse);
-  
+
       // ✅ Handle success & failure cases
       if (response.ok) {
         alert("OTP sent successfully!");
@@ -57,7 +60,7 @@ const MultipleLogin = ({ data }) => {
       alert("An error occurred. Please try again.");
     }
   };
-  
+
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F5F7FA' }}>
