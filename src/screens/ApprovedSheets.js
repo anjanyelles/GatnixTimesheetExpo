@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button ,ActivityIndicator,TouchableOpacity} from 'react-native';
 import { getApprovedsheetdata } from './aftherlogin';
-
+import * as XLSX from 'xlsx';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 const ApprovedSheets = () => {
+    const navigation=useNavigation()
+
   const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Number of items per page
   const [displayedData, setDisplayedData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [fullData, setFullData] = useState([]);
+  const [downloadData, setDownloadData] = useState({});
+
 
   // Sample table headers
   const tableHeaders = [
@@ -23,11 +33,19 @@ const ApprovedSheets = () => {
   // Fetch data on component mount
   useEffect(() => {
     const fetchApprovedSheetdata = async () => {
+      setLoading(true);
+      setCurrentPage(1);
+      setDisplayedData([]);
+      setAllData([]);
       try {
         const response = await getApprovedsheetdata();
-        console.log(response.data[0].startDate); // Debugging output
+
+        console.log("approved sheets data", response);
+
+        // console.log(response.data[0].startDate);
 
         if (response?.data) {
+          setFullData(response.data);
           const formattedData = response.data.map((item, index) => ({
             sheetId: item.sheetId || '',
             employeeName: item.employeeName || '',
@@ -42,7 +60,10 @@ const ApprovedSheets = () => {
           setAllData(formattedData);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+       console.error('Error fetching data:', error);
+      }
+      finally{
+        setLoading(false);
       }
     };
 
@@ -70,17 +91,116 @@ const ApprovedSheets = () => {
     }
   };
 
+
+
+   const downloadRowAsExcel = async (sheetId) => {
+      setLoading(true);
+      try {
+        console.log("Download Excel for sheet ID:", sheetId);
+        const selectedRow = fullData.find((item) => item.sheetId === sheetId);
+
+        const formattedData = {
+          sheetId: selectedRow.sheetId,
+          employeeName: selectedRow.employeeName,
+          clientName: selectedRow.clientName,
+          endClientName: selectedRow.endClientName,
+          startDate: new Date(selectedRow.startDate * 1000).toLocaleDateString(),
+          endDate: new Date(selectedRow.endDate * 1000).toLocaleDateString(),
+          billableHours: selectedRow.billableHours,
+          nonBillableHours: selectedRow.nonBillableHours,
+          status: selectedRow.status,
+        };
+
+        setDownloadData(formattedData);
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet([formattedData]);
+
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+        const wbout = XLSX.write(wb, { type: "base64", bookType: "xlsx" });
+
+
+        const fileUri =
+          FileSystem.documentDirectory + `Timesheet_${sheetId}.xlsx`;
+
+        await FileSystem.writeAsStringAsync(fileUri, wbout, {
+          encoding: FileSystem.EncodingType.Base64,
+        }).then(() => {
+          Sharing.shareAsync(fileUri)
+        });
+
+       // Alert.alert("Success", `Excel file saved`);
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to download Excel");
+      }
+      finally {
+        setLoading(false);
+      }
+    };
+    const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1);
+
+  const handleTimesheetDetails = (sheetId) => {
+    const selectedRow = fullData.find((item) => item.sheetId === sheetId);
+
+    console.log("Sheet ID selected:", sheetId);
+    console.log("Selected Row:", selectedRow);
+
+    if (!selectedRow) {
+      console.warn("Sheet not found for ID:", sheetId);
+      return;
+    }
+
+    const { projectId, status } = selectedRow;
+
+    console.log("Status:", status);
+
+    if (!status) {
+      console.warn("Status is empty for selected row:", selectedRow);
+      return;
+    }
+
+    const screenName = `${capitalize(status)}SheetsDetails`;
+
+    navigation.navigate(screenName, {
+      selectedRowData: selectedRow,
+      projectId,
+      status,
+    });
+
+    console.log("Navigating to:", screenName, "with:", { sheetId, status });
+  };
+  if (loading) {
+    return <ActivityIndicator size="large" color="#007bff" style={styles.loader} />;
+  }
+
   // Render a single row in the table
   const renderRow = ({ item }) => (
     <View style={styles.row}>
       <Text style={styles.cell}>{item.sheetId}</Text>
       <Text style={styles.cell}>{item.employeeName}</Text>
-      <Text style={styles.cell}>{item.period}</Text>
+            <TouchableOpacity onPress={() => handleTimesheetDetails(item.sheetId)}>
+
+      <Text style={[styles.cell,{textDecorationLine: "underline",color:"blue"}]}>{item.period}</Text>
+          </TouchableOpacity>
+
       <Text style={styles.cell}>{item.totalHours}</Text>
       <Text style={styles.cell}>{item.client}</Text>
       <Text style={styles.cell}>{item.endClient}</Text>
-      <Text style={styles.cell}>{item.status}</Text>
-      <Text style={styles.cell}>{item.comments}</Text>
+
+      <View
+        style={[styles.cell, { flexDirection: "row", alignItems: "center" }]}
+      >
+        <Text style={styles.status}>{item.status}</Text>
+        <TouchableOpacity
+          onPress={() => downloadRowAsExcel(item.sheetId)}
+          style={{ marginLeft: 6 }}
+        >
+          <Feather name="download" size={20} color="#007AFF" />
+        </TouchableOpacity>
+      </View>
+    <Text style={styles.cell}>{item.comments}</Text>
     </View>
   );
 
@@ -121,6 +241,7 @@ const ApprovedSheets = () => {
           disabled={currentPage * itemsPerPage >= allData.length} // Disable if on the last page
         />
       </View>
+
     </View>
   );
 };
@@ -132,17 +253,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'start',
-    marginBottom: 20,
-    color: '#333',
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 15,
+    color: "#374151",
   },
   header: {
-    backgroundColor: '#FF6F20',
+    backgroundColor: '#4F46E5',
     borderRadius: 5,
     marginBottom: 5,
     flexDirection: 'row',
+    padding: 10,
   },
   headerText: {
     color: '#fff',
@@ -171,6 +293,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     marginTop: 10,
+  },
+  loader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  status: {
+    fontWeight: "bold",
+    color: "#16A34A",
   },
 });
 

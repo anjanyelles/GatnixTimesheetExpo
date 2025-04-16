@@ -139,7 +139,7 @@ export const getProjectDetailsById=async(projectId)=>{
 
   try{
     return await fetch(
-      `https://www.gatnix.com/api/v1/timesheet/172/project/id/${projectId}`,
+      `https://www.gatnix.com/api/v1/timesheet/226/project/id/${projectId}`,
       {
         method: 'GET',
         headers: {
@@ -317,7 +317,7 @@ export const getApprovedsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/607/status/approved/association/super-admin?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${id}/status/approved/association/super-admin?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );
@@ -327,7 +327,7 @@ export const getPendingsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/607/status/inprogress/association/super-admin?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${id}/status/inprogress/association/super-admin?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );
@@ -336,7 +336,7 @@ export const getRejectedsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/607/status/rejected/association/super-admin?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${id}/status/rejected/association/super-admin?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );
@@ -346,7 +346,7 @@ export const getRecalledsheetdata = async () => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/607/status/recall%20Requested/association/super-admin?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${id}/status/recall%20Requested/association/super-admin?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );
