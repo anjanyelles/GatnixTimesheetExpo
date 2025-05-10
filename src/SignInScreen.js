@@ -22,7 +22,7 @@ export default function SignInScreen({ navigation }) {
       setSnackVisible(true);
       return;
     }
-  
+
     try {
       const response = await axios.post(
         "https://www.gatnix.com/api/v1/auth/login/timesheet", // Ensure this is correct
@@ -36,36 +36,36 @@ export default function SignInScreen({ navigation }) {
           },
         }
       );
-  
+
       console.log("API Response:", response.data); // Log the entire response
-  
+
       if (response.data) {
         const responseBody = response.data;
-  
+
         // Extract token and user ID properly
         const token = responseBody.accessToken || responseBody.token || null;
         const userId = responseBody.id || null;
-  
+
         // Debugging logs
         // console.log("responselll",responseBody.orgUserAssociations[0].organization.id)
         console.log("Token:", token);
         console.log("User ID:", userId);
         console.log("Email:", email);
-  
+
         // Ensure values are not null before storing them
         if (token) await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("orgId", String(responseBody.orgUserAssociations[0].organization.id));
-        
+
 
         if (userId) await AsyncStorage.setItem("id", JSON.stringify(userId));
         await AsyncStorage.setItem("email", email);
-  
+
         setLoginData(response.data);
         setcarddata(true);
         // Show success message
         setSnackMessage("Login successful. Redirecting...");
         setSnackVisible(true);
-  
+
         // Navigate to OTP screen
         navigation.navigate("OtpScreen", { email });
       } else {
@@ -92,7 +92,8 @@ export default function SignInScreen({ navigation }) {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
-  {carddata ? <><MultipleLogin data={loginData} /></> : <>    <View style={styles.formContainer}>
+  {carddata ? <><MultipleLogin data={loginData} /></> : <>
+     <View style={styles.formContainer}>
         <Text style={styles.title}>Sign In</Text>
         <Text style={styles.subtitle}>
           Sign in to get started with the power of Gatnix AI.

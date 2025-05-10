@@ -7,6 +7,7 @@ import * as Sharing from 'expo-sharing';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 const ApprovedSheets = () => {
+
     const navigation=useNavigation()
 
   const [allData, setAllData] = useState([]);
@@ -147,29 +148,11 @@ const ApprovedSheets = () => {
     console.log("Sheet ID selected:", sheetId);
     console.log("Selected Row:", selectedRow);
 
-    if (!selectedRow) {
-      console.warn("Sheet not found for ID:", sheetId);
-      return;
-    }
 
-    const { projectId, status } = selectedRow;
 
-    console.log("Status:", status);
+    navigation.navigate("ApprovedSheetsDetails", { selectedRowData:selectedRow,projectId:selectedRow.projectId });
 
-    if (!status) {
-      console.warn("Status is empty for selected row:", selectedRow);
-      return;
-    }
 
-    const screenName = `${capitalize(status)}SheetsDetails`;
-
-    navigation.navigate(screenName, {
-      selectedRowData: selectedRow,
-      projectId,
-      status,
-    });
-
-    console.log("Navigating to:", screenName, "with:", { sheetId, status });
   };
   if (loading) {
     return <ActivityIndicator size="large" color="#007bff" style={styles.loader} />;

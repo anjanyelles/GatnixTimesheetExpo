@@ -6,6 +6,7 @@ import * as FileSystem from "expo-file-system";
 import * as XLSX from "xlsx";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from '@react-navigation/native';
+
 const RecalledSheets = () => {
   const [allData, setAllData] = useState([]);  // Corrected useState
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +27,7 @@ const RecalledSheets = () => {
     'Comments',
   ];
 
+  
   useEffect(() => {
     const fetchRecalledSheetdata = async () => {
       setLoading(true);
@@ -61,7 +63,7 @@ const RecalledSheets = () => {
     };
 
     fetchRecalledSheetdata();
-  }, []);  // Empty dependency array to fetch data only once on mount
+  }, []);
 
   const loadDataForPage = (page) => {
     const startIndex = (page - 1) * itemsPerPage;
@@ -145,24 +147,10 @@ const RecalledSheets = () => {
       return;
     }
 
-    const { projectId, status } = selectedRow;
+    navigation.navigate("RecalledSheetsDetails", { selectedRowData:selectedRow,projectId:selectedRow.projectId });
 
-    console.log("Status:", status);
 
-    if (!status) {
-      console.warn("Status is empty for selected row:", selectedRow);
-      return;
-    }
 
-    const screenName = `${capitalize(status)}SheetsDetails`;
-
-    navigation.navigate(screenName, {
-      selectedRowData: selectedRow,
-      projectId,
-      status,
-    });
-
-    console.log("Navigating to:", screenName, "with:", { sheetId, status });
   };
   if (loading) {
     return <ActivityIndicator size="large" color="#007bff" style={styles.loader} />;

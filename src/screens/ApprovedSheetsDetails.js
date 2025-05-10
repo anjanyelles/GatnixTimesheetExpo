@@ -24,7 +24,7 @@ import { Feather } from "@expo/vector-icons";
 import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import axios from "axios";
 
-const SubmitedSheetsDetails = ({ route }) => {
+const ApprovedSheetsDetails = ({ route }) => {
   const { selectedRowData, projectId } = route.params
   const [count, setCount] = useState(0)
 
@@ -1164,4 +1164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SubmitedSheetsDetails;
+export default ApprovedSheetsDetails;

@@ -47,6 +47,10 @@ import AddUserEducationDetails from './src/screens/Superadmin/AddUserEducationDe
 import AddUserJobDetails from './src/screens/Superadmin/AddUserJobDetails';
 import AddUserSkillsDetails from './src/screens/Superadmin/AddUserSkillsDetails';
 import SubmitedSheetsDetails from './src/screens/SubmitedSheetsDetails';
+import ApprovedSheetsDetails from './src/screens/ApprovedSheetsDetails';
+import RecalledSheetsDetails from './src/screens/RecalledSheetsDetails';
+import RejectedSheetsDetails from './src/screens/RejectedSheetsDetails';
+import PendingSheetsDetails from './src/screens/PendingSheetsDetails';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -63,6 +67,14 @@ const DrawerNavigator = () => (
   >
     <Drawer.Screen name="Dashboard" component={Dashboard} />
 
+    <Drawer.Screen name="ApprovedSheetsDetails" component={ApprovedSheetsDetails} />
+    <Drawer.Screen name="RecalledSheetsDetails" component={RecalledSheetsDetails} />
+    <Drawer.Screen name="RejectedSheetsDetails" component={RejectedSheetsDetails} />
+    <Drawer.Screen name="PendingSheetsDetails" component={PendingSheetsDetails} />
+
+
+
+
     <Drawer.Screen name="ProjectDetails" component={ProjectDetails} />
 
     <Drawer.Screen name="Project" component={Project} />
@@ -78,6 +90,7 @@ const DrawerNavigator = () => (
 
     <Drawer.Screen name="SubmittedSheets" component={SubmittedSheets} />
     <Drawer.Screen name="SubmitedSheetsDetails" component={SubmitedSheetsDetails} />
+
 
 
 

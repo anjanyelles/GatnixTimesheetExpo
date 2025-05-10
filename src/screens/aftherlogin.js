@@ -413,11 +413,12 @@ export const getTimesheetsettingsputcall = async (data) => {
   );
 };
 
-export const getTimesheetsdatacall = async () => {
+export const getTimesheetsdatacall = async (year, monthNumber) => {
   const id = await AsyncStorage.getItem("id");
   const orgId = await AsyncStorage.getItem("orgId");
+
   return await handleApiRequestAfterLoginService(
-    `timesheet/209/date_to_date/2/2025?page=0&size=10&sort=id,desc`,
+    `timesheet/${orgId}/date_to_date/${monthNumber}/${year}?page=0&size=10&sort=id,desc`,
     "GET",
     {}
   );

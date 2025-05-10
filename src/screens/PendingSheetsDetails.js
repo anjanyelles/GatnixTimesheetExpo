@@ -24,7 +24,7 @@ import { Feather } from "@expo/vector-icons";
 import TimesheetDetailsModal from "./TimesheetDetailsModal";
 import axios from "axios";
 
-const SubmitedSheetsDetails = ({ route }) => {
+const PendingSheetsDetails = ({ route }) => {
   const { selectedRowData, projectId } = route.params
   const [count, setCount] = useState(0)
 
@@ -43,6 +43,8 @@ const SubmitedSheetsDetails = ({ route }) => {
   const [projectData, setProjectData] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageData, setCurrentPageData] = useState([]);
+  const [currentPageDataNoFormating, setCurrentPageDataNoFormating] = useState([]);
+
   const [projectImages, setProjectImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(false);
@@ -55,30 +57,11 @@ const SubmitedSheetsDetails = ({ route }) => {
   const [timesheetModalVisible, setTimesheetModalVisible] = useState(false);
 
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setCurrentPageData((prev) => ({
-  //       ...selectedRowData,
-  //       startDate: formatDate(selectedRowData.startDate),
-  //       endDate: formatDate(selectedRowData.endDate),
-  //       showStartDateToUser: formatDatetoShowUser(selectedRowData.startDate),
-  //       showEndDateToUser: formatDatetoShowUser(selectedRowData.endDate),
-  //     }));
-
-  //     if (Array.isArray(selectedRowData?.comments)) {
-  //       setComments(selectedRowData.comments);
-  //     } else {
-  //       setComments([]);
-  //     }
-  //     fetchInitialData(projectId);
-  //   }, [projectId, selectedRowData])
-  // );
-
-
-
-
   useEffect(() => {
-    // Reset state variables when new data is passed
+
+
+    setCurrentPageDataNoFormating(selectedRowData);
+
     setCurrentPageData((prev) => ({
       ...selectedRowData,
       startDate: formatDate(selectedRowData.startDate),
@@ -127,11 +110,11 @@ const SubmitedSheetsDetails = ({ route }) => {
     setLoading(true);
     try {
       const projectDetails = await getProjectDetailsById(projectId);
-      console.log("project data ", projectDetails);
+    //   console.log("project data ", projectDetails);
       setProjectData(projectDetails);
       setProjectIsClosed(projectDetails?.status === "closed");
       fetchProjectImages(selectedRowData);
-      console.log("project data ", projectDetails);
+    //   console.log("project data ", projectDetails);
     } catch (err) {
       console.error("Error fetching data", err);
     } finally {
@@ -147,14 +130,14 @@ const SubmitedSheetsDetails = ({ route }) => {
 
     setImageLoading(true);
 
-    const x = [
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (3).xlsx",
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (2).xlsx",
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (1).xlsx",
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (4).xlsx",
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (5).xlsx",
-      "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (6).xlsx",
-    ];
+    // const x = [
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (3).xlsx",
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (2).xlsx",
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (1).xlsx",
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (4).xlsx",
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (5).xlsx",
+    //   "315f8081-098f-49e5-bab1-056cba95e0cbtable-data (6).xlsx",
+    // ];
 
     try {
       const files = (data.attachments || []).map((fileName, index) => {
@@ -209,6 +192,7 @@ const SubmitedSheetsDetails = ({ route }) => {
         const data = await response.data;
 
         if (data) {
+            setCurrentPageDataNoFormating(data);
           setCurrentPageData(data);
           setCurrentPage((prev) => Math.max(prev - 1, 1));
           setCurrentPageData((prev) => ({
@@ -260,6 +244,7 @@ const SubmitedSheetsDetails = ({ route }) => {
 
         if (data) {
           console.log("Next Data:", data);
+          setCurrentPageDataNoFormating(data);
           setCurrentPageData(data);
           setCurrentPage((prev) => prev + 1);
 
@@ -337,149 +322,337 @@ const SubmitedSheetsDetails = ({ route }) => {
     }
   };
 
-  const handleApproveandReject = async (data) => {
-    console.log("=======handleApproveandReject called with data=======");
+//   const handleApproveandReject = async (data) => {
+//     console.log("=======handleApproveandReject called with data=======");
 
-   // const token = await AsyncStorage.getItem("token");
+//    // const token = await AsyncStorage.getItem("token");
+//     const orgId = await AsyncStorage.getItem("orgId");
+//     const id = await AsyncStorage.getItem("id");
+
+
+
+
+//     if (currentPageData.sheets.length > 0) {
+//         setLoading(true);
+//       try {
+
+//         const userData = await getUserProfiledata();
+//         console.log("Logged-in Admin/User Data:", userData);
+
+//         console.log("=======User ID=======");
+//         console.log("User ID:", userData.id);
+//         console.log("==================");
+
+
+//         const approverName = `${userData.user.firstName} ${userData.user.lastName}`.trim();
+//         console.log("Approver Name:", approverName);
+
+//         const comment = {
+//           systemGenerated: true,
+//           comment: `Recall Request: Your timesheet recall request has been approved by ${approverName}`,
+//           userId: userData.user.id.toString(),
+//           employeeId: currentPageData.employeeId,
+//           commentedBy: approverName,
+//           orgId: orgId.toString(),
+//           timeSheetDateToDateId: currentPageData.id,
+//           date: Math.floor(Date.now() / 1000)
+//         };
+
+//         console.log("Prepared Comment Payload:", comment);
+
+//         const commentResponse = await axios.post(
+//           `https://www.gatnix.com/api/v1/timesheet/${orgId}/comments/${userData.user.id}`,
+//           comment
+//         );
+
+//         console.log("Comment API Response all data :", commentResponse);
+
+//         const commentData = await commentResponse.data;
+//         console.log("Comment API Response is:", commentData);
+
+
+//         console.log("=======Starting approval process=======");
+
+//         const updatedtimesheet = { ...currentPageDataNoFormating };
+//         updatedtimesheet.status = "inprogress";
+//         updatedtimesheet.updatedById = id.toString();
+//         updatedtimesheet.updatedDate = Math.floor(Date.now() / 1000);
+
+//         // console.log("Before formatting comments:", updatedtimesheet.comments);
+//         // updatedtimesheet.comments = updatedtimesheet.comments.map((comment) => {
+//         //   if (!isNaN(comment.date)) {
+//         //     const unixTimestamp = parseInt(comment.date, 10);
+//         //     comment.date = new Date(unixTimestamp * 1000).toISOString().split('T')[0];
+//         //   }
+//         //   return comment;
+//         // });
+
+//         // console.log("After formatting comments:", updatedtimesheet.comments);
+
+//         // console.log("========Before PUT API call to update timesheet========");
+//          console.log("Request Body:", updatedtimesheet);
+
+
+
+//         const timesheetUpdateResponse = await axios.put(
+//           `https://www.gatnix.com/api/v1/timesheet/${orgId}/date_to_date/projectId/${projectId}/employeeId/${updatedtimesheet.employeeId}/${updatedtimesheet.id}`,
+//           updatedtimesheet
+//         );
+
+//         const timesheetUpdateData = await timesheetUpdateResponse.data;
+//         console.log("Timesheet Update Status:", timesheetUpdateData);
+
+//         console.log("======================================")
+//         console.log("employee id is:", updatedtimesheet.employeeId)
+//         console.log("========================================")
+
+//         const employeeResponse = await axios.get(
+//           `https://www.gatnix.com/api/v1/${orgId}/users/${updatedtimesheet.employeeId}/userRole/employee`
+//         );
+
+//         const employeeData = await employeeResponse.data;
+//         console.log("Employee Data:", employeeData);
+
+//         const approvalManagerAssociationIds = [];
+
+
+//         for (const managerId of projectData.approvalManagerIds) {
+//             try {
+//               console.log(`Fetching details for approval manager ID: ${managerId}`);
+
+//               const approvalManagerResponse = await axios.get(
+//                 `https://www.gatnix.com/api/v1/${orgId}/users/${managerId}/userRole/approvalManagers`
+//               );
+
+//               const approvalManagerData = approvalManagerResponse.data;
+//               console.log(`approval Manager Data for ID ${managerId}:`, approvalManagerData);
+
+
+//               if (approvalManagerData && approvalManagerData.associationId) {
+//                 approvalManagerAssociationIds.push(approvalManagerData.associationId);
+//                 console.log(` association ID ${approvalManagerData.associationId} to the list`);
+//               }
+
+//             }
+
+//             catch (managerError) {
+//               console.error(`Error fetching approval manager ${managerId}:`, managerError);
+
+//             }
+//           }
+
+
+
+
+
+
+
+//         const userAssociationIds = [employeeData.associationId, ...approvalManagerAssociationIds]
+
+
+//         const notification = {
+//           orgId: orgId,
+//           notificationSourceId: updatedtimesheet.id,
+//           notificationType: "timesheet",
+//           userAssociationIds: userAssociationIds,
+//           viewedUserAssociationIds: [0],
+//           notificationDescription: `The timesheet ID ${updatedtimesheet.sheetId} status is changed to Recall Approved.`,
+//           superAdminViewed: false,
+//           approvalManagerViewed: false,
+//           employeeViewed: false,
+//           createdAt: Math.floor(Date.now() / 1000)
+//         };
+
+//         console.log("Prepared Notification Payload:", notification);
+
+//         const notificationResponse = await axios.post(
+//           `https://www.gatnix.com/api/v1/timesheet/${orgId}/notifications`,
+//           notification
+//         );
+
+
+//         const notificationData = await notificationResponse.data;
+//         console.log("Notification API Response is ", notificationData);
+
+
+//         if (timesheetUpdateData != null && commentData !=null && notificationData !=null)
+//         {
+//           Alert.alert("Success", "Timesheet approved successfully!");
+//           setCurrentPageData(timesheetUpdateData)
+//         }
+//         else {
+//           console.warn("One or more API responses not OK.");
+//         }
+
+//       } catch (error) {
+//         console.error("Error approving timesheet:", error.response);
+//         Alert.alert("Error", "Failed to approve timesheet. Please try again.");
+//       } finally {
+//         setLoading(false);
+//       }
+
+//     } else {
+//       console.log("No timesheet data to approve");
+//       setShowApprovalAlert(true);
+//       setTimeout(() => {
+//         setShowApprovalAlert(false);
+//       }, 2000);
+//     }
+//   };
+
+
+const handleApproveandReject = async (action) => {
+    console.log(`=======handleApproveandReject called with action: ${action}=======`);
+
+    // const token = await AsyncStorage.getItem("token");
     const orgId = await AsyncStorage.getItem("orgId");
-    //const id = await AsyncStorage.getItem("id");
-
-
-    console.log("Current Page Data:", currentPageData);
+    const id = await AsyncStorage.getItem("id");
 
     if (currentPageData.sheets.length > 0) {
-      try {
         setLoading(true);
-        console.log("=======Starting approval process=======");
+        try {
+            const userData = await getUserProfiledata();
+            console.log("Logged-in Admin/User Data:", userData);
+            console.log("=======User ID=======");
+            console.log("User ID:", userData.id);
+            console.log("==================");
 
-        const updatedtimesheet = { ...currentPageData };
-        updatedtimesheet.status = "approved";
-        updatedtimesheet.updatedById = updatedtimesheet.employeeId.toString();
-        updatedtimesheet.updatedDate = Math.floor(Date.now() / 1000);
-
-        console.log("Before formatting comments:", updatedtimesheet.comments);
-        updatedtimesheet.comments = updatedtimesheet.comments.map((comment) => {
-          if (!isNaN(comment.date)) {
-            const unixTimestamp = parseInt(comment.date, 10);
-            comment.date = new Date(unixTimestamp * 1000).toISOString().split('T')[0];
-          }
-          return comment;
-        });
-
-        console.log("After formatting comments:", updatedtimesheet.comments);
-
-        console.log("========Before PUT API call to update timesheet========");
-        console.log("Request Body:", updatedtimesheet);
+            const approverName = `${userData.user.firstName} ${userData.user.lastName}`.trim();
+            console.log("Approver Name:", approverName);
 
 
+            const newStatus = action === 'approve' ? "inprogress" : "approved";
+            const commentMessage = action === 'approve' ? `Recall Request: Your timesheet recall request has been approved by ${approverName}`: `Recall Rejected: Your timesheet recall request has been rejected by ${approverName}`;
+            const notificationDescription = action === 'approve' ? `The timesheet ID ${currentPageData.sheetId} status is changed to Recall Approved.` : `The timesheet ID ${currentPageData.sheetId} status is changed to Recall Rejected.`;
 
-        const timesheetUpdateResponse = await axios.put(
-          `https://www.gatnix.com/api/v1/timesheet/${orgId}/date_to_date/projectId/${projectId}/employeeId/${updatedtimesheet.employeeId}/${updatedtimesheet.id}`,
-          updatedtimesheet
-        );
+            const comment = {
+                systemGenerated: true,
+                comment: commentMessage,
+                userId: userData.user.id.toString(),
+                employeeId: currentPageData.employeeId,
+                commentedBy: approverName,
+                orgId: orgId.toString(),
+                timeSheetDateToDateId: currentPageData.id,
+                date: Math.floor(Date.now() / 1000)
+            };
 
-        const timesheetUpdateData = await timesheetUpdateResponse.data;
-        console.log("Timesheet Update Status:", timesheetUpdateData);
+            console.log("Prepared Comment Payload:", comment);
 
-        console.log("======================================")
-        console.log("employee id is:", updatedtimesheet.employeeId)
-        console.log("========================================")
+            const commentResponse = await axios.post(`https://www.gatnix.com/api/v1/timesheet/${orgId}/comments/${userData.user.id}`,
+                comment
+            );
 
-        const employeeResponse = await axios.get(
-          `https://www.gatnix.com/api/v1/${orgId}/users/${updatedtimesheet.employeeId}/userRole/employee`
-        );
-
-        const employeeData = await employeeResponse.data;
-        console.log("Employee Data:", employeeData);
-
-        const approvalManagersResponse = await axios.get(
-        `https://www.gatnix.com/api/v1/${orgId}/users/${updatedtimesheet.employeeId}/userRole/approvalManagers`
-      );
-
-
-        const approvalManagersData = await approvalManagersResponse.data;
-        console.log("Approval Managers Data:", approvalManagersData);
-
-        const userData = await getUserProfiledata();
-        console.log("Logged-in Admin/User Data:", userData);
-
-        const approverName = `${userData.user.firstName} ${userData.user.lastName}`.trim();
-        console.log("Approver Name:", approverName);
-
-        const comment = {
-          systemGenerated: true,
-          comment: `Approved: Your timesheet has been approved by ${approverName}`,
-          userId: userData.user.id.toString(),
-          employeeId: currentPageData.employeeId,
-          commentedBy: approverName,
-          orgId: orgId.toString(),
-          timeSheetDateToDateId: currentPageData.id,
-          date: Math.floor(Date.now() / 1000)
-        };
-
-        console.log("Prepared Comment Payload:", comment);
-
-        const commentResponse = await axios.post(
-          `https://www.gatnix.com/api/v1/timesheet/${orgId}/comments/${updatedtimesheet.employeeId}`,
-          comment
-        );
+            const commentData = await commentResponse.data;
+            console.log("==============================================");
+            console.log("comment api Response is:", commentData);
+            console.log("==============================================");
 
 
-        const commentData = await commentResponse.data;
-        console.log("Comment API Response is:", commentData);
+            console.log(`=======starting procvess ${action} =======`);
 
-        const notification = {
-          orgId: orgId,
-          notificationSourceId: updatedtimesheet.id,
-          notificationType: "timesheet",
-          userAssociationIds: [employeeData.associationId, approvalManagersData.associationId],
-          viewedUserAssociationIds: [0],
-          notificationDescription: `The timesheet ID ${updatedtimesheet.sheetId} status is changed to Approved.`,
-          superAdminViewed: false,
-          approvalManagerViewed: false,
-          employeeViewed: false,
-          createdAt: Math.floor(Date.now() / 1000)
-        };
+            const updatedtimesheet = { ...currentPageDataNoFormating };
+            updatedtimesheet.status = newStatus;
+            updatedtimesheet.updatedById = id.toString();
+            updatedtimesheet.updatedDate = Math.floor(Date.now() / 1000);
 
-        console.log("Prepared Notification Payload:", notification);
+            console.log("Request Body:", updatedtimesheet);
 
-        const notificationResponse = await axios.post(
-          `https://www.gatnix.com/api/v1/timesheet/${orgId}/notifications`,
-          notification
-        );
+            const timesheetUpdateResponse = await axios.put(`https://www.gatnix.com/api/v1/timesheet/${orgId}/date_to_date/projectId/${projectId}/employeeId/${updatedtimesheet.employeeId}/${updatedtimesheet.id}`,
+                updatedtimesheet
+            );
+
+            const timesheetUpdateData = await timesheetUpdateResponse.data;
+            console.log("==============================================");
+            console.log("Timesheet Update Status:", timesheetUpdateData);
+            console.log("==============================================");
 
 
-        const notificationData = await notificationResponse.data;
-        console.log("Notification API Response is ", notificationData);
+            console.log("======================================");
+            console.log("employee id is:", updatedtimesheet.employeeId);
+            console.log("========================================");
+
+            const employeeResponse = await axios.get(`https://www.gatnix.com/api/v1/${orgId}/users/${updatedtimesheet.employeeId}/userRole/employee`);
+
+            const employeeData = await employeeResponse.data;
+            console.log("==============================================");
+            console.log("employee data:", employeeData);
+            console.log("==============================================");
 
 
-        if (
-          timesheetUpdateData != null &&
-          employeeData != null &&
-          approvalManagersData != null &&
-          commentData !=null &&
-          notificationData !=null
-        ) {
-          Alert.alert("Success", "Timesheet approved successfully!");
-        } else {
-          console.warn("One or more API responses not OK.");
+            const approvalManagerAssociationIds = [];
+
+            for (const managerId of projectData.approvalManagerIds) {
+                try {
+                    console.log(`fetching details for approval managers id is : ${managerId}`);
+
+                    const approvalManagerResponse = await axios.get(`https://www.gatnix.com/api/v1/${orgId}/users/${managerId}/userRole/approvalManagers`);
+
+                    const approvalManagerData = approvalManagerResponse.data;
+                    console.log(`approval manager data is id ${managerId}:`, approvalManagerData);
+
+                    if (approvalManagerData && approvalManagerData.associationId) {
+                        approvalManagerAssociationIds.push(approvalManagerData.associationId);
+                        console.log(` association id is  ${approvalManagerData.associationId} added to the list`);
+                    }
+                }
+                 catch (managerError) {
+                    console.error(`error fetching approval manager ${managerId}:`, managerError);
+                }
+            }
+
+            const userAssociationIds = [employeeData.associationId, ...approvalManagerAssociationIds];
+
+            const notification = {
+                orgId: orgId,
+                notificationSourceId: updatedtimesheet.id,
+                notificationType: "timesheet",
+                userAssociationIds: userAssociationIds,
+                viewedUserAssociationIds: [0],
+                notificationDescription: notificationDescription,
+                superAdminViewed: false,
+                approvalManagerViewed: false,
+                employeeViewed: false,
+                createdAt: Math.floor(Date.now() / 1000)
+            };
+
+            console.log("notification payload:", notification);
+
+            const notificationResponse = await axios.post(`https://www.gatnix.com/api/v1/timesheet/${orgId}/notifications`,
+                notification
+            );
+
+            const notificationData = await notificationResponse.data;
+            console.log("notification api response is ", notificationData);
+
+            if (timesheetUpdateData != null && commentData != null && notificationData != null) {
+                const successMessage = action === 'approve'? "Timesheet approved successfully!" : "Timesheet rejected successfully!";
+                Alert.alert("Success", successMessage);
+                setCurrentPageData(timesheetUpdateData);
+            }
+
+            else {
+                console.warn("one or more apis responses not ok.");
+            }
+
         }
 
-      } catch (error) {
-        console.error("Error approving timesheet:", error);
-        Alert.alert("Error", "Failed to approve timesheet. Please try again.");
-      } finally {
-        setLoading(false);
-      }
+        catch (error) {
+            console.error(`error ${action}ing timesheet:`, error.response);
+            Alert.alert("error", `Failed to ${action} timesheet. Please try again.`);
+        }
 
-    } else {
-      console.log("No timesheet data to approve");
-      setShowApprovalAlert(true);
-      setTimeout(() => {
-        setShowApprovalAlert(false);
-      }, 2000);
+        finally {
+            setLoading(false);
+        }
     }
-  };
+    else {
+        console.log("No timesheet data to process");
+        setShowApprovalAlert(true);
+        setTimeout(() => {
+            setShowApprovalAlert(false);
+        }, 2000);
+    }
+};
 
 
   return (
@@ -509,7 +682,7 @@ const SubmitedSheetsDetails = ({ route }) => {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("SubmittedSheets");
+            navigation.navigate('RecalledSheets');
           }}
         >
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -1164,4 +1337,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SubmitedSheetsDetails;
+export default PendingSheetsDetails;

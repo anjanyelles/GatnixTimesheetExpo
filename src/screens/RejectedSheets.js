@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 const RejectedSheets = () => {
   const [allData, setAllData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
   const [displayedData, setDisplayedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fullData, setFullData] = useState([]);
@@ -32,7 +32,7 @@ const RejectedSheets = () => {
       setLoading(true);
       try {
         const response = await getRejectedsheetdata();
-        console.log('API Response:', response);  // Debugging the response
+        console.log('API Response:', response);
 
         if (response?.data) {
           setFullData(response.data);
@@ -138,32 +138,11 @@ const RejectedSheets = () => {
   const handleTimesheetDetails = (sheetId) => {
     const selectedRow = fullData.find((item) => item.sheetId === sheetId);
 
-    console.log("Sheet ID selected:", sheetId);
-    console.log("Selected Row:", selectedRow);
 
-    if (!selectedRow) {
-      console.warn("Sheet not found for ID:", sheetId);
-      return;
-    }
 
-    const { projectId, status } = selectedRow;
+    navigation.navigate("RejectedSheetsDetails", { selectedRowData:selectedRow,projectId:selectedRow.projectId });
 
-    console.log("Status:", status);
 
-    if (!status) {
-      console.warn("Status is empty for selected row:", selectedRow);
-      return;
-    }
-
-    const screenName = `${capitalize(status)}SheetsDetails`;
-
-    navigation.navigate(screenName, {
-      selectedRowData: selectedRow,
-      projectId,
-      status,
-    });
-
-    console.log("Navigating to:", screenName, "with:", { sheetId, status });
   };
 
 

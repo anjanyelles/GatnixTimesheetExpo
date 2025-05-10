@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Button ,ActivityIndicator,TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Button ,ActivityIndicator,TouchableOpacity, Alert} from 'react-native';
 import { getPendingsheetdata } from './aftherlogin';
 import { Feather } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
@@ -142,28 +142,11 @@ const PendingSheets = () => {
     console.log("Selected Row:", selectedRow);
 
     if (!selectedRow) {
-      console.warn("Sheet not found for ID:", sheetId);
+      Alert.alert("Error", "No data found for the selected sheet ID.");
       return;
     }
+    navigation.navigate("PendingSheetsDetails", { selectedRowData:selectedRow,projectId:selectedRow.projectId });
 
-    const { projectId, status } = selectedRow;
-
-    console.log("Status:", status);
-
-    if (!status) {
-      console.warn("Status is empty for selected row:", selectedRow);
-      return;
-    }
-
-    const screenName = `${capitalize(status)}SheetsDetails`;
-
-    navigation.navigate(screenName, {
-      selectedRowData: selectedRow,
-      projectId,
-      status,
-    });
-
-    console.log("Navigating to:", screenName, "with:", { sheetId, status });
   };
   if (loading) {
     return <ActivityIndicator size="large" color="#007bff" style={styles.loader} />;
